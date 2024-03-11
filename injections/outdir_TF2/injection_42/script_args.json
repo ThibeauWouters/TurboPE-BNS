@@ -1,0 +1,1 @@
+{"outdir": "./outdir_TaylorF2_part3/", "load_existing_config": false, "N": 42, "SNR_threshold": 12, "waveform_approximant": "TaylorF2", "relative_binning_binsize": 250, "relative_binning_ref_params_equal_true_params": true, "save_training_chains": false, "eps_mass_matrix": 1e-06, "smart_initial_guess": false, "use_scheduler": true, "stopping_criterion_global_acc": 0.2}

@@ -7,7 +7,7 @@ os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
 from jimgw.single_event.likelihood import HeterodynedTransientLikelihoodFD
-from jimgw.single_event.waveform import RippleTaylorF2
+from jimgw.single_event.waveform import RippleIMRPhenomD_NRTidalv2
 from jimgw.prior import Uniform, PowerLaw, Composite 
 import jax.numpy as jnp
 import jax
@@ -186,21 +186,9 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 ### Create likelihood object
 
 n_bins = 200
-ref_params = {'M_c': 1.1977268321511816, 
-              'eta': 0.24954110236567154, 
-              's1_z': 0.0038433760209326748, 
-              's2_z': 0.0272744569746569, 
-              'lambda_1': 4160.186702844569, 
-              'lambda_2': 386.30725958015165, 
-              'd_L': 7.753535538085533, 
-              't_c': 0.004102033240710651, 
-              'phase_c': 8.872334780205075e-05, 
-              'iota': 1.5812525921774736, 
-              'psi': 2.806361265541659, 
-              'ra': 4.679568479785433, 
-              'dec': 0.2644297962203203}
+ref_params = None
 
-likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleTaylorF2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
+likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
