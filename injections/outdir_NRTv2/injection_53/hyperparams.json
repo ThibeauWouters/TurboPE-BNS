@@ -1,0 +1,1 @@
+{"flowmc": {"n_loop_training": 400, "n_loop_production": 50, "n_local_steps": 5, "n_global_steps": 400, "n_chains": 1000, "n_epochs": 50, "learning_rate": 

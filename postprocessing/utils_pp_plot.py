@@ -1,8 +1,7 @@
-import os
-os.environ["CUDA_VISIBILE_DEVICES"] = ""
 import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
+import os
 import copy
 import numpy as np
 import json
@@ -23,6 +22,7 @@ from tqdm import tqdm
 from typing import Callable
 
 ### Hyperparameters
+fs = 26
 matplotlib_params = {"axes.grid": True,
           "text.usetex" : True,
           "font.family" : "serif",
@@ -31,20 +31,13 @@ matplotlib_params = {"axes.grid": True,
           "axes.labelcolor" : "black",
           "axes.edgecolor" : "black",
           "font.serif" : ["Computer Modern Serif"],
-          "xtick.labelsize": 22,
-          "ytick.labelsize": 22,
-          "axes.labelsize": 22,
-          "legend.fontsize": 22,
-          "legend.title_fontsize": 22,
-          "figure.titlesize": 22}
+          "xtick.labelsize": fs,
+          "ytick.labelsize": fs,
+          "axes.labelsize": fs,
+          "legend.fontsize": fs,
+          "legend.title_fontsize": fs,
+          "figure.titlesize": fs}
 plt.rcParams.update(matplotlib_params)
-
-### From the GRB papers
-# red = '#F42969'
-# orange = 'orange'
-# blue = '#22ADFC'
-# purple = '#4635CE'
-# teal = '#008080'
 
 red = (255 / 260, 59 / 260, 48 / 260)
 blue = (0 / 260, 122 / 260, 255 / 260)
@@ -57,7 +50,12 @@ teal = (48 / 260, 176 / 260, 199 / 260)
 indigo = (54 / 260, 52 / 260, 163 / 260)
 purple = (175 / 260, 82 / 260, 222 / 260)
 
-my_colors = [red, blue, orange, indigo, green, teal, purple]
+# my_colors = [red, blue, orange, indigo, green, teal, purple]
+CB_color_cycle = ['#377eb8', '#ff7f00', '#4daf4a',
+                  '#f781bf', '#a65628', '#984ea3',
+                  '#e41a1c', '#dede00'] # '#999999', 
+
+my_colors = CB_color_cycle
 
 default_corner_kwargs = dict(bins=40, 
                         smooth=1., 
@@ -90,7 +88,7 @@ labels_tidal = [r'$M_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lambda_1
                r'$t_c$', r'$\phi_c$', r'$\cos\iota$', r'$\psi$', r'$\alpha$', r'$\sin\delta$']
 
 # For the combined, these are the values:
-p_calculation_dict = {"M_c": "one_sided",
+p_calculation_dict_NRTv2 = {"M_c": "one_sided",
                       "q": "one_sided",
                       "s1_z": "two_sided",
                       "s2_z": "two_sided",
@@ -98,29 +96,37 @@ p_calculation_dict = {"M_c": "one_sided",
                       "lambda_2": "two_sided", # for both: two_sided is best
                       "d_L": "two_sided",
                       "t_c": "one_sided",
-                      "phase_c": "circular", # "one_sided"
+                      "phase_c": "two_sided", # "one_sided"
                       "cos_iota": "one_sided",
                       "psi": "one_sided", # "one_sided"
-                      "ra": "two_sided", # "two_sided"
-                      "sin_dec": "two_sided"
+                      "ra": "one_sided", # "two_sided"
+                      "sin_dec": "one_sided",
+                      "chi_eff": "two_sided"
                       }
 
-p_calculation_dict_chi_eff = {"M_c": "one_sided",
+p_calculation_dict_TF2 = {"M_c": "one_sided",
                       "q": "one_sided",
-                      "chi_eff": "two_sided",
-                      "lambda_1": "one_sided",
-                      "lambda_2": "two_sided",
+                      "s1_z": "two_sided",
+                      "s2_z": "two_sided",
+                      "lambda_1": "one_sided", # for lambda tilde: one_sided, for lambdas: two_sided
+                      "lambda_2": "two_sided", # for both: two_sided
                       "d_L": "two_sided",
                       "t_c": "one_sided",
                       "phase_c": "circular", # "one_sided"
                       "cos_iota": "one_sided",
                       "psi": "one_sided", # "one_sided"
                       "ra": "two_sided", # "two_sided"
-                      "sin_dec": "two_sided"
+                      "sin_dec": "two_sided",
+                      "chi_eff": "two_sided"
                       }
 
-p_calculation_dict_values = list(p_calculation_dict.values())
-p_calculation_dict_chi_eff_values = list(p_calculation_dict_chi_eff.values())
+# p_calculation_dict_values_TF2 = list(p_calculation_dict_TF2.values())
+# p_calculation_dict_values_NRTv2 = list(p_calculation_dict_NRTv2.values())
+
+p_calculation_dict_wf = {"TF2": p_calculation_dict_TF2,
+                        "NRTv2": p_calculation_dict_NRTv2
+}
+
 
 PRIOR = {
         "M_c": [0.8759659737275101, 2.6060030916165484],
@@ -362,7 +368,7 @@ def make_cumulative_histogram(data: np.array, nb_bins: int = 100):
         np.array: The cumulative histogram, in density.
     """
     h = np.histogram(data, bins = nb_bins, range=(0,1), density=True)
-    return np.cumsum(h[0]) / 100.0
+    return np.cumsum(h[0]) / np.sum(h[0])
 
 def make_uniform_cumulative_histogram(size: tuple, nb_bins: int = 100) -> np.array:
     """
@@ -393,7 +399,8 @@ def get_true_params_and_credible_level(chains: np.array,
                                        weight_fn: Callable = lambda x: x,
                                        which_percentile_calculation="one_sided",
                                        convert_to_chi_eff: bool=False,
-                                       convert_to_lambda_tilde: bool=False
+                                       convert_to_lambda_tilde: bool=False,
+                                       wf_name: str = "NRTv2"
                                        ) -> tuple[np.array, float]:
     """
     Finds the true parameter set from a list of true parameter sets, and also computes its credible level.
@@ -407,6 +414,8 @@ def get_true_params_and_credible_level(chains: np.array,
     
     # Indices which have to be treated as circular
     naming = list(PRIOR.keys())
+    
+    p_calculation_dict_values = p_calculation_dict_wf[wf_name]
     
     # Build the weighting function
     d_L_index = naming.index("d_L")
@@ -444,11 +453,6 @@ def get_true_params_and_credible_level(chains: np.array,
         
         # Delete chi2 from naming
         naming.pop(chi2_index)
-        
-        # Also fetch correct values for the percentile calculations:
-        local_p_calculation_dict_values = p_calculation_dict_chi_eff_values
-    else:
-        local_p_calculation_dict_values = p_calculation_dict_values
         
     if convert_to_lambda_tilde:
         lambda1_index = naming.index("lambda_1")
@@ -495,14 +499,19 @@ def get_true_params_and_credible_level(chains: np.array,
         # Iterate over each parameter of this "copy" of parameters
         for j, param in enumerate(true_params):
             
-            # Get the q value in case it is needed below
-            q = percentileofscore(chains[:, j], param) / 100
-            
-            # If combined way, then choose the appropriate one for this parameter
+            # Fetch the name and its calculation key if desired
+            this_param_name = naming[j]
             if which_percentile_calculation == "combined":
-                local_which_percentile_calculation = local_p_calculation_dict_values[j]
+                local_which_percentile_calculation = p_calculation_dict_values[this_param_name]
+                # print("this_param_name")
+                # print(this_param_name)
+                # print("local_which_percentile_calculation")
+                # print(local_which_percentile_calculation)
             else:
                 local_which_percentile_calculation = which_percentile_calculation
+            
+            # Get the q value in case it is needed below
+            q = percentileofscore(chains[:, j], param) / 100
             
             # TODO add the combined option here
             if local_which_percentile_calculation == "one_sided":
@@ -545,7 +554,8 @@ def get_credible_levels_injections(outdir: str,
                                    save: bool = True,
                                    convert_cos_sin: bool = True,
                                    convert_to_chi_eff: bool = False,
-                                   convert_to_lambda_tilde: bool = False) -> np.array:
+                                   convert_to_lambda_tilde: bool = False,
+                                   wf_name: str = "NRTv2") -> np.array:
     """
     Compute the credible levels list for all the injections. 
     
@@ -562,6 +572,8 @@ def get_credible_levels_injections(outdir: str,
         
     print("naming")
     print(naming)
+    print("wf_name")
+    print(wf_name)
     n_dim = len(naming)
     
     print("Reading injection results")
@@ -619,7 +631,8 @@ def get_credible_levels_injections(outdir: str,
                                                                              weight_fn=weight_fn,
                                                                              which_percentile_calculation=which_percentile_calculation,
                                                                              convert_to_chi_eff=convert_to_chi_eff,
-                                                                             convert_to_lambda_tilde=convert_to_lambda_tilde)
+                                                                             convert_to_lambda_tilde=convert_to_lambda_tilde,
+                                                                             wf_name=wf_name)
             
             credible_level_list.append(credible_level)
             

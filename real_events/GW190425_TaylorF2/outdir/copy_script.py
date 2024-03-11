@@ -85,8 +85,8 @@ print(tukey_alpha)
 for ifo in [L1, V1]:
     ifo.load_data(
         trigger_time=trigger_time,
-        gps_start_pad=duration-2,
-        gps_end_pad=2,
+        gps_start_pad=duration-post_trigger_duration,
+        gps_end_pad=post_trigger_duration,
         f_min = fmin,
         f_max = fmax,
         tukey_alpha = tukey_alpha,
@@ -198,22 +198,38 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 n_bins = 200
 
-ref_params = {
-    'M_c': 1.48597014,
-    'eta': 0.21593324,
-    's1_z': 0.03201217,
-    's2_z': -0.04464742,
-    'lambda_1': 3770.53191574,
-    'lambda_2': 12.0157453,
-    'd_L': 35.42152782,
-    't_c': -0.01343332,
-    'phase_c': 0.91422449,
-    'iota': 2.93582712,
-    'psi': 2.00726107,
-    'ra': 5.19030855,
-    'dec': 0.51985741
-}
+# ref_params = {
+#     'M_c': 1.48597014,
+#     'eta': 0.21593324,
+#     's1_z': 0.03201217,
+#     's2_z': -0.04464742,
+#     'lambda_1': 3770.53191574,
+#     'lambda_2': 12.0157453,
+#     'd_L': 35.42152782,
+#     't_c': -0.01343332,
+#     'phase_c': 0.91422449,
+#     'iota': 2.93582712,
+#     'psi': 2.00726107,
+#     'ra': 5.19030855,
+#     'dec': 0.51985741
+# }
 
+
+ref_params = {
+    'M_c': 1.486722,
+    'eta': 0.18946014,
+    's1_z': 0.04419246,
+    's2_z': 0.00038679,
+    'lambda_1': 455.74266717,
+    'lambda_2': 144.29782064,
+    'd_L': 131.97211914,
+    't_c': -0.01579126,
+    'phase_c': 1.98962121,
+    'iota': 1.11046195,
+    'psi': 2.02977615,
+    'ra': 1.26495061,
+    'dec': -0.42639091
+}
 
 likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleTaylorF2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
@@ -249,38 +265,14 @@ scheduler_str = f"polynomial_schedule({start_lr}, {end_lr}, {power}, {total_epoc
 # Create jim object
 
 outdir_name = "./outdir/"
-jim = Jim(
-    likelihood,
-    prior,
-    n_loop_training=n_loop_training,
-    n_loop_production=40,
-    n_local_steps=5,
-    n_global_steps=400,
-    n_chains=1000,
-    n_epochs=n_epochs,
-    learning_rate=schedule_fn,
-    max_samples=50000,
-    momentum=0.9,
-    batch_size=50000,
-    use_global=True,
-    keep_quantile=0.0,
-    train_thinning=10,
-    output_thinning=30,    
-    local_sampler_arg=local_sampler_arg,
-    stopping_criterion_global_acc = 0.25,
-    outdir_name=outdir_name
-)
-
-
-### These were the old (december) hyperparams
 # jim = Jim(
 #     likelihood,
 #     prior,
 #     n_loop_training=n_loop_training,
 #     n_loop_production=40,
-#     n_local_steps=500,
-#     n_global_steps=500,
-#     n_chains=2000,
+#     n_local_steps=5,
+#     n_global_steps=400,
+#     n_chains=1000,
 #     n_epochs=n_epochs,
 #     learning_rate=schedule_fn,
 #     max_samples=50000,
@@ -289,11 +281,34 @@ jim = Jim(
 #     use_global=True,
 #     keep_quantile=0.0,
 #     train_thinning=10,
-#     output_thinning=50,    
+#     output_thinning=30,    
 #     local_sampler_arg=local_sampler_arg,
 #     stopping_criterion_global_acc = 0.25,
 #     outdir_name=outdir_name
 # )
+
+
+### These were the old (december) hyperparams
+jim = Jim(
+    likelihood,
+    prior,
+    n_loop_training=200,
+    n_loop_production=200,
+    n_local_steps=500,
+    n_global_steps=500,
+    n_chains=2000,
+    n_epochs=100,
+    learning_rate=0.001,
+    max_samples=50000,
+    momentum=0.9,
+    batch_size=50000,
+    use_global=True,
+    keep_quantile=0.0,
+    train_thinning=20,
+    output_thinning=50,    
+    local_sampler_arg=local_sampler_arg,
+    outdir_name=outdir_name
+)
 
 ### Heavy computation begins
 jim.sample(jax.random.PRNGKey(37))

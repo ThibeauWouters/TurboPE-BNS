@@ -1,8 +1,9 @@
-import os
-os.environ["CUDA_VISIBILE_DEVICES"] = "-1"
 import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
+import os
+os.environ["CUDA_VISIBILE_DEVICES"] = "0"
+os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
 import numpy as np
 # import arviz 
 import matplotlib.pyplot as plt
@@ -41,8 +42,8 @@ def make_pp_plot(credible_level_list: np.array,
     """
     
     # Group the plotting hyperparameters here: 
-    bbox_to_anchor = (1.1, 1.0)
-    legend_fontsize = 20
+    bbox_to_anchor = (1.025, 1.0)
+    legend_fontsize = 26
     handlelength = 1
     linewidth = 2
     min_alpha = 0.15
@@ -148,9 +149,9 @@ def make_pp_plot(credible_level_list: np.array,
         
 if __name__ == "__main__":
     
-    
     name = "NRTv2"
     outdir = f"../injections/outdir_{name}/"
+    print(f"Making pp plot for outdir: {outdir}")
     figures_dir = f"../figures/"
     
     which_percentile_calculation = "combined" # which function to use to compute the percentiles
@@ -158,7 +159,7 @@ if __name__ == "__main__":
     reweigh_distance = False # whether to reweigh samples based on the distance, due to the SNR cutoff used
     return_first = True # whether to just use injected params or to also look at sky mirrored locations
     convert_cos_sin = True # convert from cos iota and sin dec to iota and dec
-    convert_to_lambda_tilde = False
+    convert_to_lambda_tilde = False # whether to convert to lambda tildes or not
     thinning_factor = 1
     compute_percentiles = False
     
@@ -198,7 +199,8 @@ if __name__ == "__main__":
                                                                         save=False,
                                                                         convert_cos_sin=convert_cos_sin,
                                                                         convert_to_chi_eff=convert_to_chi_eff,
-                                                                        convert_to_lambda_tilde=convert_to_lambda_tilde)
+                                                                        convert_to_lambda_tilde=convert_to_lambda_tilde,
+                                                                        wf_name=name)
     else:
         file = f"../figures/percentile_values_{name}_chieff.npz"
         print(f"Loading credible levels from {file}")
