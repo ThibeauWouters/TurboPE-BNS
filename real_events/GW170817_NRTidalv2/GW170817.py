@@ -2,7 +2,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
@@ -186,7 +186,22 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 ### Create likelihood object
 
 n_bins = 200
-ref_params = None
+ref_params = {
+    'M_c': 1.19754648,
+    'eta': 0.24994958,
+    's1_z': -0.02431239,
+    's2_z': 0.02297961,
+    'lambda_1': 1146.97930151,
+    'lambda_2': 1.56490691,
+    'd_L': 16.01717323,
+    't_c': 0.00205422,
+    'phase_c': 1.14667506,
+    'iota': 1.92641014,
+    'psi': 0.02519606,
+    'ra': 3.39769149,
+    'dec': -0.34196637
+}
+
 
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
@@ -205,7 +220,7 @@ mass_matrix = mass_matrix.at[11,11].set(1e-2)
 mass_matrix = mass_matrix.at[12,12].set(1e-2)
 local_sampler_arg = {"step_size": mass_matrix * eps}
 
-# Build the learning rate scheduler
+# Build the learning rate scheduler (if used)
 
 n_loop_training = 200
 n_epochs = 50
@@ -219,19 +234,48 @@ schedule_fn = optax.polynomial_schedule(
 
 scheduler_str = f"polynomial_schedule({start_lr}, {end_lr}, {power}, {total_epochs-start}, {start})"
 
+# Choose between fixed learning rate - or - the above scheduler here
+
+learning_rate = 1e-3
+learning_rate = schedule_fn
+
 # Create jim object
 
 outdir_name = "./outdir/"
+
+# jim = Jim(
+#     likelihood,
+#     prior,
+#     n_loop_training=n_loop_training,
+#     n_loop_production=40,
+#     n_local_steps=5,
+#     n_global_steps=400,
+#     n_chains=1000,
+#     n_epochs=n_epochs,
+#     learning_rate=learning_rate,
+#     max_samples=50000,
+#     momentum=0.9,
+#     batch_size=50000,
+#     use_global=True,
+#     keep_quantile=0.0,
+#     train_thinning=10,
+#     output_thinning=30,    
+#     local_sampler_arg=local_sampler_arg,
+#     stopping_criterion_global_acc = 0.25,
+#     outdir_name=outdir_name
+# )
+
 jim = Jim(
     likelihood,
     prior,
-    n_loop_training=n_loop_training,
-    n_loop_production=40,
-    n_local_steps=5,
-    n_global_steps=400,
+    n_loop_pretraining=0,
+    n_loop_training=200,
+    n_loop_production=20,
+    n_local_steps=200,
+    n_global_steps=200,
     n_chains=1000,
-    n_epochs=n_epochs,
-    learning_rate=schedule_fn,
+    n_epochs=100,
+    learning_rate=0.001,
     max_samples=50000,
     momentum=0.9,
     batch_size=50000,
@@ -239,13 +283,13 @@ jim = Jim(
     keep_quantile=0.0,
     train_thinning=10,
     output_thinning=30,    
+    n_loops_maximize_likelihood = 2000,
     local_sampler_arg=local_sampler_arg,
-    stopping_criterion_global_acc = 0.25,
     outdir_name=outdir_name
 )
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(42))
+jim.sample(jax.random.PRNGKey(41))
 ### Heavy computation ends
 
 # === Show results, save output ===

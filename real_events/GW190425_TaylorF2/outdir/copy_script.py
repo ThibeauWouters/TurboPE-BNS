@@ -141,7 +141,6 @@ s1z_prior = Uniform(-0.05, 0.05, naming=["s1_z"])
 s2z_prior = Uniform(-0.05, 0.05, naming=["s2_z"])
 lambda_1_prior = Uniform(0.0, 5000.0, naming=["lambda_1"])
 lambda_2_prior = Uniform(0.0, 5000.0, naming=["lambda_2"])
-# dL_prior       = PowerLaw(1.0, 75.0, 2.0, naming=["d_L"])
 dL_prior       = Uniform(1.0, 500.0, naming=["d_L"])
 t_c_prior      = Uniform(-0.1, 0.1, naming=["t_c"])
 phase_c_prior  = Uniform(0.0, 2 * jnp.pi, naming=["phase_c"])
@@ -205,7 +204,7 @@ ref_params = {
     's1_z': 0.03201217,
     's2_z': -0.04464742,
     'lambda_1': 3770.53191574,
-    'lambda_2': 0.0,
+    'lambda_2': 12.0157453,
     'd_L': 35.42152782,
     't_c': -0.01343332,
     'phase_c': 0.91422449,
@@ -236,7 +235,7 @@ local_sampler_arg = {"step_size": mass_matrix * eps}
 # Build the learning rate scheduler
 
 n_loop_training = 200
-n_epochs = 50
+n_epochs = 100
 total_epochs = n_epochs * n_loop_training
 start = int(total_epochs / 10)
 start_lr = 1e-3
@@ -272,8 +271,32 @@ jim = Jim(
     outdir_name=outdir_name
 )
 
+
+### These were the old (december) hyperparams
+# jim = Jim(
+#     likelihood,
+#     prior,
+#     n_loop_training=n_loop_training,
+#     n_loop_production=40,
+#     n_local_steps=500,
+#     n_global_steps=500,
+#     n_chains=2000,
+#     n_epochs=n_epochs,
+#     learning_rate=schedule_fn,
+#     max_samples=50000,
+#     momentum=0.9,
+#     batch_size=50000,
+#     use_global=True,
+#     keep_quantile=0.0,
+#     train_thinning=10,
+#     output_thinning=50,    
+#     local_sampler_arg=local_sampler_arg,
+#     stopping_criterion_global_acc = 0.25,
+#     outdir_name=outdir_name
+# )
+
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(42))
+jim.sample(jax.random.PRNGKey(37))
 ### Heavy computation ends
 
 # === Show results, save output ===
