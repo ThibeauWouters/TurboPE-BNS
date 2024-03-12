@@ -2,6 +2,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os
+os.environ["CUDA_VISIBILE_DEVICES"] = "-1"
 import copy
 import numpy as np
 import json
@@ -10,6 +11,8 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 from scipy.stats import kstest, uniform, percentileofscore
 import jax.numpy as jnp
+import jax
+jax.config.update("jax_enable_x64", True)
 
 from ripple import get_chi_eff, Mc_eta_to_ms, lambdas_to_lambda_tildes, lambda_tildes_to_lambdas
 from arviz import hdi
@@ -20,6 +23,8 @@ sys.path.append("../tidal/")
 
 from tqdm import tqdm
 from typing import Callable
+
+print(jax.devices())
 
 ### Hyperparameters
 fs = 26
@@ -92,15 +97,15 @@ p_calculation_dict_NRTv2 = {"M_c": "one_sided",
                       "q": "one_sided",
                       "s1_z": "two_sided",
                       "s2_z": "two_sided",
-                      "lambda_1": "one_sided", # for lambda tilde: one_sided, for lambdas: two_sided
-                      "lambda_2": "two_sided", # for both: two_sided is best
+                      "lambda_1": "one_sided", 
+                      "lambda_2": "two_sided",
                       "d_L": "two_sided",
                       "t_c": "one_sided",
-                      "phase_c": "two_sided", # "one_sided"
+                      "phase_c": ["circular", "one_sided"], # "one_sided"
                       "cos_iota": "one_sided",
                       "psi": "one_sided", # "one_sided"
                       "ra": "one_sided", # "two_sided"
-                      "sin_dec": "one_sided",
+                      "sin_dec": "one_sided", # ["circular", "one_sided"],
                       "chi_eff": "two_sided"
                       }
 
@@ -246,17 +251,10 @@ def get_credible_level_circular(samples: np.array,
                                 injected_value: float, 
                                 name: str,
                                 nb_bins: int = 20,
-                                debug_plotting: bool = False):
+                                debug_plotting: bool = False,
+                                which_percentile: str = "two_sided"):
     """
-    This function computes the credible level using the scipy functionalities.
-
-    Args:
-        samples (np.array): Posterior samples
-        injected_value (float): _description_
-        circular (bool, optional): _description_. Defaults to False.
-
-    Returns:
-        _type_: _description_
+    This function computes the credible level for circular parameters.
     """
     
     # Do appropriate changes
@@ -296,8 +294,9 @@ def get_credible_level_circular(samples: np.array,
     percentile = percentileofscore(samples, injected_value) / 100
     
     # TODO toggle one sided or two sided by the user
-    percentile = 1 - 2 * min(percentile, 1-percentile)
-    
+    if which_percentile == "two_sided":
+        percentile = 1 - 2 * min(percentile, 1-percentile)
+        
     return percentile
     
 
@@ -521,9 +520,16 @@ def get_true_params_and_credible_level(chains: np.array,
             # NOTE scipy is broken!
             elif local_which_percentile_calculation == "scipy":
                 credible_level = get_credible_level_scipy(chains[:, j], param, idx = j)
-            elif local_which_percentile_calculation == "circular":
+            elif "circular" in local_which_percentile_calculation:
+                # must be list, the second option is one or two sided
+                try: 
+                    which_percentile = local_which_percentile_calculation[1]
+                except Exception as e:
+                    print("failed to get which_percentile: ", e)
+                    print("Choosing defualt")
+                    which_percentile = "two_sided"
                 name = naming[j]
-                credible_level = get_credible_level_circular(chains[:, j], param, name = name)
+                credible_level = get_credible_level_circular(chains[:, j], param, name = name, which_percentile = which_percentile)
                 
             params_credible_level_list.append(credible_level)
         

@@ -2,8 +2,8 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os
-os.environ["CUDA_VISIBILE_DEVICES"] = "0"
-os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
+os.environ["CUDA_VISIBILE_DEVICES"] = "-1"
+# os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
 import numpy as np
 # import arviz 
 import matplotlib.pyplot as plt
@@ -150,6 +150,8 @@ def make_pp_plot(credible_level_list: np.array,
 if __name__ == "__main__":
     
     name = "NRTv2"
+    compute_percentiles = True
+    
     outdir = f"../injections/outdir_{name}/"
     print(f"Making pp plot for outdir: {outdir}")
     figures_dir = f"../figures/"
@@ -158,20 +160,19 @@ if __name__ == "__main__":
     convert_to_chi_eff = True # whether to convert spins to chi eff or not
     reweigh_distance = False # whether to reweigh samples based on the distance, due to the SNR cutoff used
     return_first = True # whether to just use injected params or to also look at sky mirrored locations
-    convert_cos_sin = True # convert from cos iota and sin dec to iota and dec
+    convert_cos_sin = False # convert from cos iota and sin dec to iota and dec
     convert_to_lambda_tilde = False # whether to convert to lambda tildes or not
-    thinning_factor = 1
-    compute_percentiles = False
+    thinning_factor = 100
     
     print(f"script hyperparams: \nreweigh_distance = {reweigh_distance}, \nreturn_first = {return_first}, \nconvert_cos_sin = {convert_cos_sin}")
     
     if reweigh_distance:
-        ## Deprectated
-        # kde_file = "../postprocessing/kde_dL.npz"
-        # data = np.load(kde_file)
-        # kde_x = data["x"]
-        # kde_y = data["y"]
-        # weight_fn = lambda x: np.interp(x, kde_x, kde_y)
+        # Deprectated
+        kde_file = "../postprocessing/kde_dL.npz"
+        data = np.load(kde_file)
+        kde_x = data["x"]
+        kde_y = data["y"]
+        weight_fn = lambda x: np.interp(x, kde_x, kde_y)
         pass
     else:
         weight_fn = lambda x: x
