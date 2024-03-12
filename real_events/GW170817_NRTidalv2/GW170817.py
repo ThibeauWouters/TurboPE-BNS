@@ -222,12 +222,12 @@ local_sampler_arg = {"step_size": mass_matrix * eps}
 
 # Build the learning rate scheduler (if used)
 
-n_loop_training = 200
+n_loop_training = 400
 n_epochs = 50
 total_epochs = n_epochs * n_loop_training
 start = int(total_epochs / 10)
 start_lr = 1e-3
-end_lr = 1e-6
+end_lr = 1e-5
 power = 4.0
 schedule_fn = optax.polynomial_schedule(
     start_lr, end_lr, power, total_epochs-start, transition_begin=start)
@@ -236,7 +236,7 @@ scheduler_str = f"polynomial_schedule({start_lr}, {end_lr}, {power}, {total_epoc
 
 # Choose between fixed learning rate - or - the above scheduler here
 
-learning_rate = 1e-3
+# learning_rate = 1e-3
 learning_rate = schedule_fn
 
 # Create jim object
@@ -248,7 +248,7 @@ jim = Jim(
     prior,
     n_loop_training=n_loop_training,
     n_loop_production=40,
-    n_local_steps=5,
+    n_local_steps=100,
     n_global_steps=400,
     n_chains=1000,
     n_epochs=n_epochs,
