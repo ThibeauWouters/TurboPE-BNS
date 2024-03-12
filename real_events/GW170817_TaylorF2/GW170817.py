@@ -252,7 +252,7 @@ jim = Jim(
     train_thinning=10,
     output_thinning=30,    
     local_sampler_arg=local_sampler_arg,
-    stopping_criterion_global_acc = 0.25,
+    stopping_criterion_global_acc = 0.20,
     outdir_name=outdir_name
 )
 
