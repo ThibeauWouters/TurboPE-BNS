@@ -81,44 +81,56 @@ print(tukey_alpha)
 
 ### Getting detector data
 
-data_dict = {"L1":{"data": data_path + "L-L1_HOFT_C01_T1700406_v3-1240211456-4096.gwf",
-                   "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
-                   "channel": "L1:DCS-CALIB_STRAIN_CLEAN_C01_T1700406_v3"},
-            "V1":{"data": data_path + "V-V1Online_T1700406_v3-1240214000-2000.gwf",
-                    "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
-                    "channel": "V1:Hrec_hoft_16384Hz_T1700406_v3"}
-}
+# Load the data
+L1.load_data(trigger_time=trigger_time,
+             gps_start_pad=duration-2,
+             gps_end_pad=2,
+             f_min=fmin,
+             f_max=fmax,
+             tukey_alpha = tukey_alpha,
+             load_psd = False)
 
-data_dict = {"L1":{"data": data_path + "L-L1_GWOSC_16KHZ_R1-1240213455-4096.hdf5",
-                   "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
-                   "channel": "L1:GWOSC-16KHZ_R1_STRAIN"},
-            "V1":{"data": data_path + "V-V1_GWOSC_16KHZ_R1-1240213455-4096.hdf5",
-                    "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
-                    "channel": "V1:GWOSC-16KHZ_R1_STRAIN"}
-}
+V1.load_data(trigger_time=trigger_time,
+             gps_start_pad=duration-2,
+             gps_end_pad=2,
+             f_min=fmin,
+             f_max=fmax,
+             tukey_alpha = tukey_alpha,
+             load_psd = False)
 
-L1.load_data_from_frame(trigger_time=trigger_time,
-                        gps_start_pad=duration-2,
-                        gps_end_pad=2,
-                        frame_file_path=data_dict["L1"]["data"],
-                        channel_name=data_dict["L1"]["channel"],
-                        f_min=fmin,
-                        f_max=fmax,
-                        tukey_alpha=tukey_alpha,
-                        type="hdf5")
+# # Load the PSDs from given files
+# data_location = "/home/thibeau.wouters/gw-datasets/GW190425/"
+# L1.load_psd(L1.frequencies, data_location + "glitch_median_PSD_forLI_L1_srate8192.txt")
+# V1.load_psd(V1.frequencies, data_location + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
-V1.load_data_from_frame(trigger_time=trigger_time,
-                        gps_start_pad=duration-2,
-                        gps_end_pad=2,
-                        frame_file_path=data_dict["V1"]["data"],
-                        channel_name=data_dict["V1"]["channel"],
-                        f_min=fmin,
-                        f_max=fmax,
-                        tukey_alpha=tukey_alpha,
-                        type="hdf5")
+# data_location = "./data/"
 
-L1.psd = L1.load_psd(L1.frequencies, data_dict["L1"]["psd"])
-V1.psd = V1.load_psd(V1.frequencies, data_dict["V1"]["psd"])
+# data_dict = {"L1":{"data": data_path + "L-L1_HOFT_C01_T1700406_v3-1240211456-4096.gwf",
+#                    "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
+#                    "channel": "DCS-CALIB_STRAIN_CLEAN_C01_T1700406_v3"},
+#             "V1":{"data": data_path + "V-V1Online_T1700406_v3-1240214000-2000.gwf",
+#                     "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
+#                     "channel": "Hrec_hoft_16384Hz_T1700406_v3"}
+# }
+
+# L1.load_data_from_frame(trigger_time=trigger_time,
+#                         gps_start_pad=duration-2,
+#                         gps_end_pad=2,
+#                         frame_file_path=data_dict["L1"]["data"],
+#                         channel_name=data_dict["L1"]["channel"],
+#                         f_min=fmin,
+#                         f_max=fmax)
+
+# V1.load_data_from_frame(trigger_time=trigger_time,
+#                         gps_start_pad=duration-2,
+#                         gps_end_pad=2,
+#                         frame_file_path=data_dict["V1"]["data"],
+#                         channel_name=data_dict["V1"]["channel"],
+#                         f_min=fmin,
+#                         f_max=fmax)
+
+L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
+V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
 ### Define priors
 
@@ -189,24 +201,26 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
 
-n_bins = 250
+n_bins = 200
 
-ref_params = {
-    'M_c': 1.48692321,
-    'eta': 0.24277442,
-    's1_z': 0.04921051,
-    's2_z': -0.00138039,
-    'lambda_1': 305.2043933,
-    'lambda_2': 27.93292563,
-    'd_L': 138.97742221,
-    't_c': -0.01752647,
-    'phase_c': 2.37343933,
-    'iota': 0.99937377,
-    'psi': 0.5421814,
-    'ra': 1.13575943,
-    'dec': -0.54013979
-}
+# ref_params = {
+#     'M_c': 1.48597014,
+#     'eta': 0.21593324,
+#     's1_z': 0.03201217,
+#     's2_z': -0.04464742,
+#     'lambda_1': 3770.53191574,
+#     'lambda_2': 12.0157453,
+#     'd_L': 35.42152782,
+#     't_c': -0.01343332,
+#     'phase_c': 0.91422449,
+#     'iota': 2.93582712,
+#     'psi': 2.00726107,
+#     'ra': 5.19030855,
+#     'dec': 0.51985741
+# }
 
+
+ref_params = None
 
 likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
@@ -232,7 +246,7 @@ n_epochs = 100
 total_epochs = n_epochs * n_loop_training
 start = int(total_epochs / 10)
 start_lr = 1e-3
-end_lr = 1e-4
+end_lr = 1e-5
 power = 4.0
 schedule_fn = optax.polynomial_schedule(
     start_lr, end_lr, power, total_epochs-start, transition_begin=start)
@@ -260,7 +274,7 @@ jim = Jim(
     train_thinning=10,
     output_thinning=30,    
     local_sampler_arg=local_sampler_arg,
-    stopping_criterion_global_acc = 0.20,
+    stopping_criterion_global_acc = 0.25,
     outdir_name=outdir_name
 )
 

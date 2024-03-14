@@ -3,7 +3,7 @@ p = psutil.Process()
 p.cpu_affinity([0])
 import os 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
+os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.15"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
 from jimgw.single_event.likelihood import HeterodynedTransientLikelihoodFD
@@ -81,44 +81,56 @@ print(tukey_alpha)
 
 ### Getting detector data
 
-data_dict = {"L1":{"data": data_path + "L-L1_HOFT_C01_T1700406_v3-1240211456-4096.gwf",
-                   "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
-                   "channel": "L1:DCS-CALIB_STRAIN_CLEAN_C01_T1700406_v3"},
-            "V1":{"data": data_path + "V-V1Online_T1700406_v3-1240214000-2000.gwf",
-                    "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
-                    "channel": "V1:Hrec_hoft_16384Hz_T1700406_v3"}
-}
+# Load the data
+L1.load_data(trigger_time=trigger_time,
+             gps_start_pad=duration-2,
+             gps_end_pad=2,
+             f_min=fmin,
+             f_max=fmax,
+             tukey_alpha = tukey_alpha,
+             load_psd = False)
 
-data_dict = {"L1":{"data": data_path + "L-L1_GWOSC_16KHZ_R1-1240213455-4096.hdf5",
-                   "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
-                   "channel": "L1:GWOSC-16KHZ_R1_STRAIN"},
-            "V1":{"data": data_path + "V-V1_GWOSC_16KHZ_R1-1240213455-4096.hdf5",
-                    "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
-                    "channel": "V1:GWOSC-16KHZ_R1_STRAIN"}
-}
+V1.load_data(trigger_time=trigger_time,
+             gps_start_pad=duration-2,
+             gps_end_pad=2,
+             f_min=fmin,
+             f_max=fmax,
+             tukey_alpha = tukey_alpha,
+             load_psd = False)
 
-L1.load_data_from_frame(trigger_time=trigger_time,
-                        gps_start_pad=duration-2,
-                        gps_end_pad=2,
-                        frame_file_path=data_dict["L1"]["data"],
-                        channel_name=data_dict["L1"]["channel"],
-                        f_min=fmin,
-                        f_max=fmax,
-                        tukey_alpha=tukey_alpha,
-                        type="hdf5")
+# # Load the PSDs from given files
+# data_location = "/home/thibeau.wouters/gw-datasets/GW190425/"
+# L1.load_psd(L1.frequencies, data_location + "glitch_median_PSD_forLI_L1_srate8192.txt")
+# V1.load_psd(V1.frequencies, data_location + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
-V1.load_data_from_frame(trigger_time=trigger_time,
-                        gps_start_pad=duration-2,
-                        gps_end_pad=2,
-                        frame_file_path=data_dict["V1"]["data"],
-                        channel_name=data_dict["V1"]["channel"],
-                        f_min=fmin,
-                        f_max=fmax,
-                        tukey_alpha=tukey_alpha,
-                        type="hdf5")
+# data_location = "./data/"
 
-L1.psd = L1.load_psd(L1.frequencies, data_dict["L1"]["psd"])
-V1.psd = V1.load_psd(V1.frequencies, data_dict["V1"]["psd"])
+# data_dict = {"L1":{"data": data_path + "L-L1_HOFT_C01_T1700406_v3-1240211456-4096.gwf",
+#                    "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
+#                    "channel": "DCS-CALIB_STRAIN_CLEAN_C01_T1700406_v3"},
+#             "V1":{"data": data_path + "V-V1Online_T1700406_v3-1240214000-2000.gwf",
+#                     "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
+#                     "channel": "Hrec_hoft_16384Hz_T1700406_v3"}
+# }
+
+# L1.load_data_from_frame(trigger_time=trigger_time,
+#                         gps_start_pad=duration-2,
+#                         gps_end_pad=2,
+#                         frame_file_path=data_dict["L1"]["data"],
+#                         channel_name=data_dict["L1"]["channel"],
+#                         f_min=fmin,
+#                         f_max=fmax)
+
+# V1.load_data_from_frame(trigger_time=trigger_time,
+#                         gps_start_pad=duration-2,
+#                         gps_end_pad=2,
+#                         frame_file_path=data_dict["V1"]["data"],
+#                         channel_name=data_dict["V1"]["channel"],
+#                         f_min=fmin,
+#                         f_max=fmax)
+
+L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
+V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
 ### Define priors
 
@@ -255,9 +267,6 @@ schedule_fn = optax.polynomial_schedule(
 
 scheduler_str = f"polynomial_schedule({start_lr}, {end_lr}, {power}, {total_epochs-start}, {start})"
 
-# Choose whether to use fixed LR or scheduled LR here
-learning_rate = scheduler_str
-
 # Create jim object
 outdir_name = "./outdir/"
 jim = Jim(
@@ -269,7 +278,7 @@ jim = Jim(
     n_global_steps=400,
     n_chains=1000,
     n_epochs=n_epochs,
-    learning_rate=learning_rate,
+    learning_rate=schedule_fn,
     max_samples=50000,
     momentum=0.9,
     batch_size=50000,
@@ -278,7 +287,7 @@ jim = Jim(
     train_thinning=10,
     output_thinning=30,    
     local_sampler_arg=local_sampler_arg,
-    stopping_criterion_global_acc = 0.20,
+    stopping_criterion_global_acc = 0.10,
     outdir_name=outdir_name
 )
 
@@ -306,7 +315,7 @@ jim = Jim(
 # )
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(37))
+jim.sample(jax.random.PRNGKey(82))
 ### Heavy computation ends
 
 # === Show results, save output ===

@@ -96,7 +96,7 @@ def compute_p_value_kstest_dict(percentiles_dict: dict):
 
 def postprocess_samples(samples, 
                         true_params,
-                        convert_ra: bool = True,
+                        convert_ra: bool = False,
                         convert_chi_eff: bool = True):
     
     
@@ -106,7 +106,6 @@ def postprocess_samples(samples,
     for idx in [phase_c_index, psi_index]:
         samples[idx] = undo_periodicity(samples[idx])
         true_params[idx] = undo_periodicity(true_params[idx])
-        
         
     if convert_ra:
         # TODO remove this this is just for a test

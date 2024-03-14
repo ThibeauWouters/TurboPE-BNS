@@ -55,7 +55,8 @@ labels = [r'$\mathcal{M}_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lamb
 ## TODO remove?
 labels_chi_eff = [r'$M_c/M_\odot$', r'$q$', r'$\chi_{\rm eff}$', r'$\tilde{\Lambda}$', r'$\delta\tilde{\Lambda}$' ,r'$d_{\rm{L}}/{\rm Mpc}$',r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
 
-gwosc_names = ['chirp_mass', 'mass_ratio', 'spin_1z', 'spin_2z', 'lambda_tilde', 'delta_lambda', 'luminosity_distance', 't0', 'phase', 'iota', 'psi', 'ra', 'dec']
+gwosc_names = ['chirp_mass', 'mass_ratio', 'spin_1z', 'spin_2z', 'lambda_1', 'lambda_2', 'luminosity_distance', 't0', 'phase', 'iota', 'psi', 'ra', 'dec']
+trigger_time = 1240215503.017147
 
 #################
 ### UTILITIES ###
@@ -79,8 +80,8 @@ def get_chains_GWOSC(filename: str, key: str = "TaylorF2"):
         posterior = file[key]['posterior_samples']#[()]
         pnames = posterior.dtype.names
         print("GWOSC parameter names:") 
-        for name in pnames:
-            print(name)
+        # for name in pnames:
+        #     print(name)
         gwosc_indices = [pnames.index(name) for name in gwosc_names]
 
         # Fetch the posterior samples for the parameters that we are interested in
@@ -89,6 +90,10 @@ def get_chains_GWOSC(filename: str, key: str = "TaylorF2"):
             samples.append([samp[ind] for samp in posterior[()]])
 
         samples = np.asarray(samples).T
+        
+        # Subtract trigger time from t0 samples
+        t0_idx = gwosc_names.index("t0")
+        samples[:, t0_idx] -= trigger_time
         
         print("samples shape:", np.shape(samples))
         
