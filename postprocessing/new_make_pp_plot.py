@@ -2,6 +2,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import pickle
 import numpy as np
 import json
@@ -95,6 +96,7 @@ def compute_p_value_kstest_dict(percentiles_dict: dict):
 
 def postprocess_samples(samples, 
                         true_params,
+                        convert_ra: bool = True,
                         convert_chi_eff: bool = True):
     
     
@@ -104,6 +106,16 @@ def postprocess_samples(samples,
     for idx in [phase_c_index, psi_index]:
         samples[idx] = undo_periodicity(samples[idx])
         true_params[idx] = undo_periodicity(true_params[idx])
+        
+        
+    if convert_ra:
+        # TODO remove this this is just for a test
+        ra_index = naming.index("ra")
+        samples[ra_index] = undo_periodicity(samples[ra_index])
+        true_params[ra_index] = undo_periodicity(true_params[ra_index])
+        
+        samples[ra_index] = np.sin(samples[ra_index])
+        true_params[ra_index] = np.sin(true_params[ra_index])
     
     if convert_chi_eff:    
         # Compute chi eff values
@@ -343,12 +355,11 @@ def make_pp_plot(percentile_dict: dict,
     print(title_string)
     
     print("Saving pp-plot")
-    plt.grid(False) # disable grid
+    plt.grid(False) # disable grida
     plt.title(title_string)
     plt.xlim(0, 1)
     plt.ylim(0, 1)
     
-    save_name = f"./figures/{save_name}"    
     for ext in [".png", ".pdf"]:
         full_savename = save_name + ext
         print(f"Saving pp-plot to: {full_savename}")
@@ -360,7 +371,7 @@ def make_pp_plot(percentile_dict: dict,
 
 def main():
     
-    compute = False
+    compute = True
     convert_chi_eff = True
     exclude_bad_injections = False
     

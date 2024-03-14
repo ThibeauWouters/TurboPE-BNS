@@ -1,12 +1,14 @@
-import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "2"
-os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.1"
-import numpy as np
-import argparse
-# The following is needed on CIT cluster to avoid an obscure Python error
+"""
+Idea: try different learning rate schemes to try and fix the injections
+"""
 import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = "3"
+os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
+import numpy as np
+import argparse
 # Regular imports 
 import argparse
 import copy
@@ -126,6 +128,12 @@ def get_parser(**kwargs):
         help="Overall scale factor to rescale the step size of the local sampler.",
     )
     parser.add_argument(
+        "--which-local-sampler",
+        type=str,
+        default="MALA",
+        help="Which local sampler to use.",
+    )
+    parser.add_argument(
         "--smart-initial-guess",
         type=bool,
         default=False,
@@ -142,6 +150,18 @@ def get_parser(**kwargs):
         type=float,
         default=1.0,
         help="Stop the run once we reach this global acceptance rate.",
+    )
+    parser.add_argument(
+        "--save-likelihood",
+        type=bool,
+        default=False,
+        help="Whether to save the likelihood object",
+    )
+    parser.add_argument(
+        "--tight-Mc-prior",
+        type=bool,
+        default=False,
+        help="Whether to use a tight prior on the Mc values or not",
     )
     # # TODO this has to be implemented
     # parser.add_argument(
@@ -190,7 +210,8 @@ def body(args):
             "precompile": False, 
             "verbose": False, 
             "outdir": args.outdir,
-            "stopping_criterion_global_acc": args.stopping_criterion_global_acc
+            "stopping_criterion_global_acc": args.stopping_criterion_global_acc,
+            "which_local_sampler": "MALA"
         }, 
     "jim": 
         {
@@ -206,6 +227,7 @@ def body(args):
     jim_hyperparameters = HYPERPARAMETERS["jim"]
     hyperparameters = {**flowmc_hyperparameters, **jim_hyperparameters}
     
+    # TODO can I just replace this with update dict?
     for key, value in args.__dict__.items():
         if key in hyperparameters:
             hyperparameters[key] = value
@@ -268,7 +290,7 @@ def body(args):
         
         # Start injections
         print("Injecting signals . . .")
-        waveform = ripple_waveform_fn(f_ref = config["fref"])
+        waveform = ripple_waveform_fn(f_ref=config["fref"])
         
         # Create frequency grid
         freqs = jnp.arange(
@@ -357,7 +379,12 @@ def body(args):
     print("Start prior setup")
     
     # Priors without transformation 
-    Mc_prior       = Uniform(prior_low[0], prior_high[0], naming=['M_c'])
+    if args.tight_Mc_prior:
+        print("INFO: Using a tight chirp mass prior")
+        true_mc = true_param["M_c"]
+        Mc_prior = Uniform(true_mc - 0.1, true_mc + 0.1, naming=['M_c'])
+    else:
+        Mc_prior       = Uniform(prior_low[0], prior_high[0], naming=['M_c'])
     q_prior        = Uniform(prior_low[1], prior_high[1], naming=['q'],
                             transforms={
                                 'q': (
@@ -427,6 +454,27 @@ def body(args):
     else:
         ref_params = None
         print("Will search for reference waveform for relative binning")
+    
+    ### TODO remove
+    # Explicitly fix relative binning for NRTidalv2
+    if args.waveform_approximant in ["IMRPhenomD_NRTidalv2", "NRTidalv2"]:
+        # ## TODO this might be broken?
+        # # # Explicitly set the f_min and f_max used there
+        # # relbin_kwargs = {"f_min": config["fmin"], "f_max": config["f_sampling"] / 2}
+        # relbin_kwargs = {}
+        
+        # # Set the reference parameters at the ideal location for not breaking relative binning 
+        # print("Setting the reference parameters to not break the relative binning for NRTidalv2")
+        # ref_params = true_param 
+        # ref_params["lambda_1"] = 1.0
+        # ref_params["lambda_2"] = 1.0
+        
+        print("Now, the reference parameters are: ")
+        print(ref_params)
+    else:
+        relbin_kwargs = {}
+        
+    relbin_kwargs = {}
         
     likelihood = HeterodynedTransientLikelihoodFD(
         ifos,
@@ -437,13 +485,20 @@ def body(args):
         trigger_time=config["trigger_time"],
         duration=config["duration"],
         post_trigger_duration=config["post_trigger_duration"],
-        ref_params=ref_params # put the reference waveform of the relative binning at the true parameters
+        ref_params=ref_params,
+        **relbin_kwargs
         )
+    
+    if args.save_likelihood:
+        print(f"INFO: Saving the likelihood to {outdir}")
+        import pickle 
+        with open(f'{outdir}likelihood.pickle', 'wb') as handle:
+            pickle.dump(likelihood, handle, protocol=pickle.HIGHEST_PROTOCOL)
     
     # Save the ref params
     utils.save_relative_binning_ref_params(likelihood, outdir)
 
-    # Generate arguments for the local sampler
+    # Generate arguments for the local samplercd
     mass_matrix = jnp.eye(len(prior_list))
     for idx, prior in enumerate(prior_list):
         mass_matrix = mass_matrix.at[idx, idx].set(prior.xmax - prior.xmin) # fetch the prior range
@@ -452,9 +507,8 @@ def body(args):
     
     # Create jim object
     jim = Jim(
-        likelihood, 
+        likelihood,
         complete_prior,
-        nf_lr_autotune = True,
         **hyperparameters
     )
     
@@ -468,7 +522,7 @@ def body(args):
         initial_guess = jnp.array([])
     
     ### Finally, do the sampling
-    jim.sample(jax.random.PRNGKey(24), initial_guess = initial_guess)
+    jim.sample(jax.random.PRNGKey(23), initial_guess = initial_guess)
         
     # === Show results, save output ===
 

@@ -81,51 +81,44 @@ print(tukey_alpha)
 
 ### Getting detector data
 
-# Load the data
-for ifo in [L1, V1]:
-    ifo.load_data(
-        trigger_time=trigger_time,
-        gps_start_pad=duration-post_trigger_duration,
-        gps_end_pad=post_trigger_duration,
-        f_min = fmin,
-        f_max = fmax,
-        tukey_alpha = tukey_alpha,
-        psd_pad = T
-)
+data_dict = {"L1":{"data": data_path + "L-L1_HOFT_C01_T1700406_v3-1240211456-4096.gwf",
+                   "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
+                   "channel": "L1:DCS-CALIB_STRAIN_CLEAN_C01_T1700406_v3"},
+            "V1":{"data": data_path + "V-V1Online_T1700406_v3-1240214000-2000.gwf",
+                    "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
+                    "channel": "V1:Hrec_hoft_16384Hz_T1700406_v3"}
+}
 
-# # Load the PSDs from given files
-# data_location = "/home/thibeau.wouters/gw-datasets/GW190425/"
-# L1.load_psd(L1.frequencies, data_location + "glitch_median_PSD_forLI_L1_srate8192.txt")
-# V1.load_psd(V1.frequencies, data_location + "glitch_median_PSD_forLI_V1_srate8192.txt")
+data_dict = {"L1":{"data": data_path + "L-L1_GWOSC_16KHZ_R1-1240213455-4096.hdf5",
+                   "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
+                   "channel": "L1:GWOSC-16KHZ_R1_STRAIN"},
+            "V1":{"data": data_path + "V-V1_GWOSC_16KHZ_R1-1240213455-4096.hdf5",
+                    "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
+                    "channel": "V1:GWOSC-16KHZ_R1_STRAIN"}
+}
 
-# data_location = "./data/"
+L1.load_data_from_frame(trigger_time=trigger_time,
+                        gps_start_pad=duration-2,
+                        gps_end_pad=2,
+                        frame_file_path=data_dict["L1"]["data"],
+                        channel_name=data_dict["L1"]["channel"],
+                        f_min=fmin,
+                        f_max=fmax,
+                        tukey_alpha=tukey_alpha,
+                        type="hdf5")
 
-# data_dict = {"L1":{"data": data_path + "L-L1_HOFT_C01_T1700406_v3-1240211456-4096.gwf",
-#                    "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
-#                    "channel": "DCS-CALIB_STRAIN_CLEAN_C01_T1700406_v3"},
-#             "V1":{"data": data_path + "V-V1Online_T1700406_v3-1240214000-2000.gwf",
-#                     "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
-#                     "channel": "Hrec_hoft_16384Hz_T1700406_v3"}
-# }
+V1.load_data_from_frame(trigger_time=trigger_time,
+                        gps_start_pad=duration-2,
+                        gps_end_pad=2,
+                        frame_file_path=data_dict["V1"]["data"],
+                        channel_name=data_dict["V1"]["channel"],
+                        f_min=fmin,
+                        f_max=fmax,
+                        tukey_alpha=tukey_alpha,
+                        type="hdf5")
 
-# L1.load_data_from_frame(trigger_time=trigger_time,
-#                         gps_start_pad=duration-2,
-#                         gps_end_pad=2,
-#                         frame_file_path=data_dict["L1"]["data"],
-#                         channel_name=data_dict["L1"]["channel"],
-#                         f_min=fmin,
-#                         f_max=fmax)
-
-# V1.load_data_from_frame(trigger_time=trigger_time,
-#                         gps_start_pad=duration-2,
-#                         gps_end_pad=2,
-#                         frame_file_path=data_dict["V1"]["data"],
-#                         channel_name=data_dict["V1"]["channel"],
-#                         f_min=fmin,
-#                         f_max=fmax)
-
-L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
-V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
+L1.psd = L1.load_psd(L1.frequencies, data_dict["L1"]["psd"])
+V1.psd = V1.load_psd(V1.frequencies, data_dict["V1"]["psd"])
 
 ### Define priors
 
@@ -231,7 +224,7 @@ ref_params = {
     'dec': -0.42639091
 }
 
-likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleTaylorF2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
+likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleTaylorF2(), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
@@ -250,65 +243,67 @@ local_sampler_arg = {"step_size": mass_matrix * eps}
 
 # Build the learning rate scheduler
 
-n_loop_training = 200
+n_loop_training = 400
 n_epochs = 100
 total_epochs = n_epochs * n_loop_training
 start = int(total_epochs / 10)
 start_lr = 1e-3
-end_lr = 1e-6
+end_lr = 1e-5
 power = 4.0
 schedule_fn = optax.polynomial_schedule(
     start_lr, end_lr, power, total_epochs-start, transition_begin=start)
 
 scheduler_str = f"polynomial_schedule({start_lr}, {end_lr}, {power}, {total_epochs-start}, {start})"
 
+# Choose whether to use fixed LR or scheduled LR here
+learning_rate = 1e-3
+
 # Create jim object
-
 outdir_name = "./outdir/"
-# jim = Jim(
-#     likelihood,
-#     prior,
-#     n_loop_training=n_loop_training,
-#     n_loop_production=40,
-#     n_local_steps=5,
-#     n_global_steps=400,
-#     n_chains=1000,
-#     n_epochs=n_epochs,
-#     learning_rate=schedule_fn,
-#     max_samples=50000,
-#     momentum=0.9,
-#     batch_size=50000,
-#     use_global=True,
-#     keep_quantile=0.0,
-#     train_thinning=10,
-#     output_thinning=30,    
-#     local_sampler_arg=local_sampler_arg,
-#     stopping_criterion_global_acc = 0.25,
-#     outdir_name=outdir_name
-# )
-
-
-### These were the old (december) hyperparams
 jim = Jim(
     likelihood,
     prior,
-    n_loop_training=200,
-    n_loop_production=200,
-    n_local_steps=500,
-    n_global_steps=500,
-    n_chains=2000,
-    n_epochs=100,
-    learning_rate=0.001,
+    n_loop_training=n_loop_training,
+    n_loop_production=40,
+    n_local_steps=5,
+    n_global_steps=400,
+    n_chains=1000,
+    n_epochs=n_epochs,
+    learning_rate=learning_rate,
     max_samples=50000,
     momentum=0.9,
     batch_size=50000,
     use_global=True,
     keep_quantile=0.0,
-    train_thinning=20,
-    output_thinning=50,    
+    train_thinning=10,
+    output_thinning=30,    
     local_sampler_arg=local_sampler_arg,
+    stopping_criterion_global_acc = 0.40,
     outdir_name=outdir_name
 )
+
+
+# ### These were the old (december) hyperparams
+# jim = Jim(
+#     likelihood,
+#     prior,
+#     n_loop_training=200,
+#     n_loop_production=200,
+#     n_local_steps=500,
+#     n_global_steps=500,
+#     n_chains=2000,
+#     n_epochs=100,
+#     learning_rate=0.001,
+#     max_samples=50000,
+#     momentum=0.9,
+#     batch_size=50000,
+#     use_global=True,
+#     keep_quantile=0.0,
+#     train_thinning=20,
+#     output_thinning=50,    
+#     local_sampler_arg=local_sampler_arg,
+#     outdir_name=outdir_name
+# )
 
 ### Heavy computation begins
 jim.sample(jax.random.PRNGKey(37))
