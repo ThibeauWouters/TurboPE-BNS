@@ -98,37 +98,6 @@ V1.load_data(trigger_time=trigger_time,
              tukey_alpha = tukey_alpha,
              load_psd = False)
 
-# # Load the PSDs from given files
-# data_location = "/home/thibeau.wouters/gw-datasets/GW190425/"
-# L1.load_psd(L1.frequencies, data_location + "glitch_median_PSD_forLI_L1_srate8192.txt")
-# V1.load_psd(V1.frequencies, data_location + "glitch_median_PSD_forLI_V1_srate8192.txt")
-
-# data_location = "./data/"
-
-# data_dict = {"L1":{"data": data_path + "L-L1_HOFT_C01_T1700406_v3-1240211456-4096.gwf",
-#                    "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
-#                    "channel": "DCS-CALIB_STRAIN_CLEAN_C01_T1700406_v3"},
-#             "V1":{"data": data_path + "V-V1Online_T1700406_v3-1240214000-2000.gwf",
-#                     "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
-#                     "channel": "Hrec_hoft_16384Hz_T1700406_v3"}
-# }
-
-# L1.load_data_from_frame(trigger_time=trigger_time,
-#                         gps_start_pad=duration-2,
-#                         gps_end_pad=2,
-#                         frame_file_path=data_dict["L1"]["data"],
-#                         channel_name=data_dict["L1"]["channel"],
-#                         f_min=fmin,
-#                         f_max=fmax)
-
-# V1.load_data_from_frame(trigger_time=trigger_time,
-#                         gps_start_pad=duration-2,
-#                         gps_end_pad=2,
-#                         frame_file_path=data_dict["V1"]["data"],
-#                         channel_name=data_dict["V1"]["channel"],
-#                         f_min=fmin,
-#                         f_max=fmax)
-
 L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
 V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
@@ -202,23 +171,6 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 ### Create likelihood object
 
 n_bins = 200
-
-# ref_params = {
-#     'M_c': 1.48597014,
-#     'eta': 0.21593324,
-#     's1_z': 0.03201217,
-#     's2_z': -0.04464742,
-#     'lambda_1': 3770.53191574,
-#     'lambda_2': 12.0157453,
-#     'd_L': 35.42152782,
-#     't_c': -0.01343332,
-#     'phase_c': 0.91422449,
-#     'iota': 2.93582712,
-#     'psi': 2.00726107,
-#     'ra': 5.19030855,
-#     'dec': 0.51985741
-# }
-
 
 ref_params = {
     'M_c': 1.486722,
