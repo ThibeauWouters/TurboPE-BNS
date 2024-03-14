@@ -5,7 +5,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "3"
+os.environ['CUDA_VISIBLE_DEVICES'] = "2"
 os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
 import numpy as np
 import argparse
@@ -23,7 +23,7 @@ import jax.numpy as jnp
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
 from jimgw.single_event.likelihood import HeterodynedTransientLikelihoodFD, TransientLikelihoodFD
-from jimgw.single_event.waveform import RippleTaylorF2, RippleIMRPhenomD_NRTidalv2, RippleIMRPhenomD_NRTidalv2_no_taper
+from jimgw.single_event.waveform import RippleTaylorF2, RippleIMRPhenomD_NRTidalv2
 from jimgw.prior import Uniform, Composite
 import utils # our plotting and postprocessing utilities script
 
@@ -455,40 +455,33 @@ def body(args):
         ref_params = None
         print("Will search for reference waveform for relative binning")
     
-    # ### TODO remove
-    # # Explicitly fix relative binning for NRTidalv2
-    # if args.waveform_approximant in ["IMRPhenomD_NRTidalv2", "NRTidalv2"]:
-    #     # ## TODO this might be broken?
-    #     # # # Explicitly set the f_min and f_max used there
-    #     # # relbin_kwargs = {"f_min": config["fmin"], "f_max": config["f_sampling"] / 2}
-    #     # relbin_kwargs = {}
+    ### TODO remove
+    # Explicitly fix relative binning for NRTidalv2
+    if args.waveform_approximant in ["IMRPhenomD_NRTidalv2", "NRTidalv2"]:
+        # ## TODO this might be broken?
+        # # # Explicitly set the f_min and f_max used there
+        # # relbin_kwargs = {"f_min": config["fmin"], "f_max": config["f_sampling"] / 2}
+        # relbin_kwargs = {}
         
-    #     # # Set the reference parameters at the ideal location for not breaking relative binning 
-    #     # print("Setting the reference parameters to not break the relative binning for NRTidalv2")
-    #     # ref_params = true_param 
-    #     # ref_params["lambda_1"] = 1.0
-    #     # ref_params["lambda_2"] = 1.0
+        # # Set the reference parameters at the ideal location for not breaking relative binning 
+        # print("Setting the reference parameters to not break the relative binning for NRTidalv2")
+        # ref_params = true_param 
+        # ref_params["lambda_1"] = 1.0
+        # ref_params["lambda_2"] = 1.0
         
-    #     print("Now, the reference parameters are: ")
-    #     print(ref_params)
-    # else:
-    #     relbin_kwargs = {}
+        print("Now, the reference parameters are: ")
+        print(ref_params)
+    else:
+        relbin_kwargs = {}
         
     relbin_kwargs = {}
-    
-    if args.waveform_approximant == "IMRPhenomD_NRTidalv2":
-        print("Using IMRPhenomD_NRTidalv2 no taper as the reference waveform for the likelihood")
-        reference_waveform = RippleIMRPhenomD_NRTidalv2_no_taper(f_ref=config["fref"])
-    else:
-        reference_waveform = waveform
         
     likelihood = HeterodynedTransientLikelihoodFD(
         ifos,
         prior=complete_prior,
-        bounds=bounds, 
+        bounds=bounds,
         n_bins = args.relative_binning_binsize,
         waveform=waveform,
-        reference_waveform=reference_waveform,
         trigger_time=config["trigger_time"],
         duration=config["duration"],
         post_trigger_duration=config["post_trigger_duration"],
@@ -529,7 +522,7 @@ def body(args):
         initial_guess = jnp.array([])
     
     ### Finally, do the sampling
-    jim.sample(jax.random.PRNGKey(24), initial_guess = initial_guess)
+    jim.sample(jax.random.PRNGKey(23), initial_guess = initial_guess)
         
     # === Show results, save output ===
 
