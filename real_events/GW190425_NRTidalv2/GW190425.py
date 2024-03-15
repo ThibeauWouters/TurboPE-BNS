@@ -203,24 +203,21 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 n_bins = 200
 
-# ref_params = {
-#     'M_c': 1.48597014,
-#     'eta': 0.21593324,
-#     's1_z': 0.03201217,
-#     's2_z': -0.04464742,
-#     'lambda_1': 3770.53191574,
-#     'lambda_2': 12.0157453,
-#     'd_L': 35.42152782,
-#     't_c': -0.01343332,
-#     'phase_c': 0.91422449,
-#     'iota': 2.93582712,
-#     'psi': 2.00726107,
-#     'ra': 5.19030855,
-#     'dec': 0.51985741
-# }
-
-
-ref_params = None
+ref_params = {
+    'M_c': 1.48673471,
+    'eta': 0.24964816,
+    's1_z': -0.03212059,
+    's2_z': 0.04940074,
+    'lambda_1': 170.66131572,
+    'lambda_2': 392.72069516,
+    'd_L': 90.496605,
+    't_c': 0.02454119,
+    'phase_c': 6.27789316,
+    'iota': 1.15036904,
+    'psi': 1.9846727,
+    'ra': 4.08402371,
+    'dec': 0.51115334
+}
 
 likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
@@ -274,32 +271,9 @@ jim = Jim(
     train_thinning=10,
     output_thinning=30,    
     local_sampler_arg=local_sampler_arg,
-    stopping_criterion_global_acc = 0.25,
+    stopping_criterion_global_acc = 0.10,
     outdir_name=outdir_name
 )
-
-
-# ### These were the old (december) hyperparams
-# jim = Jim(
-#     likelihood,
-#     prior,
-#     n_loop_training=200,
-#     n_loop_production=200,
-#     n_local_steps=500,
-#     n_global_steps=500,
-#     n_chains=2000,
-#     n_epochs=100,
-#     learning_rate=0.001,
-#     max_samples=50000,
-#     momentum=0.9,
-#     batch_size=50000,
-#     use_global=True,
-#     keep_quantile=0.0,
-#     train_thinning=20,
-#     output_thinning=50,    
-#     local_sampler_arg=local_sampler_arg,
-#     outdir_name=outdir_name
-# )
 
 ### Heavy computation begins
 jim.sample(jax.random.PRNGKey(37))
