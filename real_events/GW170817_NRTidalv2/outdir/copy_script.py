@@ -2,7 +2,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.15"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
@@ -129,8 +129,8 @@ s1z_prior = Uniform(-0.05, 0.05, naming=["s1_z"])
 s2z_prior = Uniform(-0.05, 0.05, naming=["s2_z"])
 lambda_1_prior = Uniform(0.0, 5000.0, naming=["lambda_1"])
 lambda_2_prior = Uniform(0.0, 5000.0, naming=["lambda_2"])
-# dL_prior       = PowerLaw(1.0, 75.0, 2.0, naming=["d_L"])
 dL_prior       = Uniform(1.0, 75.0, naming=["d_L"])
+# dL_prior       = PowerLaw(1.0, 75.0, 2.0, naming=["d_L"])
 t_c_prior      = Uniform(-0.1, 0.1, naming=["t_c"])
 phase_c_prior  = Uniform(0.0, 2 * jnp.pi, naming=["phase_c"])
 cos_iota_prior = Uniform(
@@ -185,7 +185,22 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
 
-n_bins = 200
+
+# ref_params = {'M_c': 1.19754357, 
+#               'eta': 0.24984541, 
+#               's1_z': -0.00429651, 
+#               's2_z': 0.00470304, 
+#               'lambda_1': 1816.51300368, 
+#               'lambda_2': 0.10161503, 
+#               'd_L': 10.87770389, 
+#               't_c': 0.00864911, 
+#               'phase_c': 4.33436689, 
+#               'iota': 1.59216065, 
+#               'psi': 1.69112445, 
+#               'ra': 5.08658471, 
+#               'dec': 0.47136332
+# }
+
 ref_params = {
     'M_c': 1.19754648,
     'eta': 0.24994958,
@@ -202,13 +217,13 @@ ref_params = {
     'dec': -0.34196637
 }
 
-
+n_bins = 200
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
 
-eps = 1e-2
+eps = 1e-3
 n_dim = 13
 mass_matrix = jnp.eye(n_dim)
 mass_matrix = mass_matrix.at[0,0].set(1e-5)
@@ -246,13 +261,13 @@ outdir_name = "./outdir/"
 jim = Jim(
     likelihood,
     prior,
-    n_loop_training=n_loop_training,
-    n_loop_production=40,
-    n_local_steps=100,
-    n_global_steps=400,
+    n_loop_training=300,
+    n_loop_production=20,
+    n_local_steps=10,
+    n_global_steps=300,
     n_chains=1000,
-    n_epochs=n_epochs,
-    learning_rate=learning_rate,
+    n_epochs=100,
+    learning_rate=schedule_fn,
     max_samples=50000,
     momentum=0.9,
     batch_size=50000,
@@ -263,10 +278,10 @@ jim = Jim(
     local_sampler_arg=local_sampler_arg,
     stopping_criterion_global_acc = 0.10,
     outdir_name=outdir_name
-)
+) # n_loops_maximize_likelihood = 2000, ## unused
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(41))
+jim.sample(jax.random.PRNGKey(42))
 ### Heavy computation ends
 
 # === Show results, save output ===

@@ -130,6 +130,7 @@ s2z_prior = Uniform(-0.05, 0.05, naming=["s2_z"])
 lambda_1_prior = Uniform(0.0, 5000.0, naming=["lambda_1"])
 lambda_2_prior = Uniform(0.0, 5000.0, naming=["lambda_2"])
 dL_prior       = Uniform(1.0, 75.0, naming=["d_L"])
+# dL_prior       = PowerLaw(1.0, 75.0, 2.0, naming=["d_L"])
 t_c_prior      = Uniform(-0.1, 0.1, naming=["t_c"])
 phase_c_prior  = Uniform(0.0, 2 * jnp.pi, naming=["phase_c"])
 cos_iota_prior = Uniform(
@@ -275,7 +276,7 @@ outdir_name = "./outdir/"
 jim = Jim(
     likelihood,
     prior,
-    n_loop_training=300,
+    n_loop_training=400,
     n_loop_production=20,
     n_local_steps=10,
     n_global_steps=300,

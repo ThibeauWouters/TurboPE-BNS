@@ -34,11 +34,11 @@ plt.rcParams.update(matplotlib_params)
 ### PREAMBLE ###
 ################
 
-
 outdirs_dict = {"TF2": '/home/thibeau.wouters/TurboPE-BNS/injections/outdir_TF2/',
                 "NRTv2": '/home/thibeau.wouters/TurboPE-BNS/injections/outdir_NRTv2/'}
 
-problematic_injections_dict = {"NRTv2": [1, 2, 45, 74, 81, 89],
+# all injections are OK now
+problematic_injections_dict = {"NRTv2": [],
                                "TF2": []}
 
 naming = ['M_c', 'q', 's1_z', 's2_z', 'lambda_1', 'lambda_2', 'd_L', 't_c', 'phase_c', 'cos_iota', 'psi', 'ra', 'sin_dec']
