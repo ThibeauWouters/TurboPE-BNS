@@ -2,7 +2,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.15"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
@@ -54,7 +54,8 @@ labels = [r'$M_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lambda$', r'$\
                r'$t_c$', r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
 naming = ['M_c', 'q', 's1_z', 's2_z', 'lambda_1', 'lambda_2', 'd_L', 't_c', 'phase_c', 'cos_iota', 'psi', 'ra', 'sin_dec']
 
-data_path = "/home/thibeau.wouters/gw-datasets/GW170817/" # on CIT
+data_path = "./"
+data_path = "/home/twouters2/gw-datasets/GW170817/"
 
 start_runtime = time.time()
 
@@ -112,8 +113,8 @@ s1z_prior = Uniform(-0.05, 0.05, naming=["s1_z"])
 s2z_prior = Uniform(-0.05, 0.05, naming=["s2_z"])
 lambda_1_prior = Uniform(0.0, 5000.0, naming=["lambda_1"])
 lambda_2_prior = Uniform(0.0, 5000.0, naming=["lambda_2"])
-dL_prior       = Uniform(1.0, 75.0, naming=["d_L"])
 # dL_prior       = PowerLaw(1.0, 75.0, 2.0, naming=["d_L"])
+dL_prior       = Uniform(1.0, 75.0, naming=["d_L"])
 t_c_prior      = Uniform(-0.1, 0.1, naming=["t_c"])
 phase_c_prior  = Uniform(0.0, 2 * jnp.pi, naming=["phase_c"])
 cos_iota_prior = Uniform(
@@ -173,8 +174,8 @@ ref_params = {
     'eta': 0.2461001,
     's1_z': -0.01890608,
     's2_z': 0.04888488,
-    'lambda_1': 4791.04366468,
-    'lambda_2': 4891.04366468,
+    'lambda_1': 791.04366468,
+    'lambda_2': 891.04366468,
     'd_L': 16.06331818,
     't_c': 0.00193536,
     'phase_c': 5.88649652,
@@ -184,13 +185,14 @@ ref_params = {
     'dec': -0.34000186
 }
 
-n_bins = 200
+n_bins = 100
+
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
 
-eps = 1e-3
+eps = 1e-2
 n_dim = 13
 mass_matrix = jnp.eye(n_dim)
 mass_matrix = mass_matrix.at[0,0].set(1e-5)
@@ -202,7 +204,7 @@ mass_matrix = mass_matrix.at[11,11].set(1e-2)
 mass_matrix = mass_matrix.at[12,12].set(1e-2)
 local_sampler_arg = {"step_size": mass_matrix * eps}
 
-# Build the learning rate scheduler (if used)
+# Build the learning rate scheduler
 
 n_loop_training = 400
 n_epochs = 50
@@ -216,24 +218,18 @@ schedule_fn = optax.polynomial_schedule(
 
 scheduler_str = f"polynomial_schedule({start_lr}, {end_lr}, {power}, {total_epochs-start}, {start})"
 
-# Choose between fixed learning rate - or - the above scheduler here
-
-# learning_rate = 1e-3
-learning_rate = schedule_fn
-
 # Create jim object
 
 outdir_name = "./outdir/"
-
 jim = Jim(
     likelihood,
     prior,
-    n_loop_training=300,
+    n_loop_training=n_loop_training,
     n_loop_production=20,
-    n_local_steps=10,
-    n_global_steps=300,
+    n_local_steps=5,
+    n_global_steps=400,
     n_chains=1000,
-    n_epochs=100,
+    n_epochs=n_epochs,
     learning_rate=schedule_fn,
     max_samples=50000,
     momentum=0.9,
@@ -245,7 +241,7 @@ jim = Jim(
     local_sampler_arg=local_sampler_arg,
     stopping_criterion_global_acc = 0.10,
     outdir_name=outdir_name
-) # n_loops_maximize_likelihood = 2000, ## unused
+)
 
 ### Heavy computation begins
 jim.sample(jax.random.PRNGKey(41))
@@ -329,3 +325,4 @@ print(f"Time taken: {runtime} seconds ({(runtime)/60} minutes)")
 print(f"Saving runtime")
 with open(outdir + 'runtime.txt', 'w') as file:
     file.write(str(runtime))
+    
