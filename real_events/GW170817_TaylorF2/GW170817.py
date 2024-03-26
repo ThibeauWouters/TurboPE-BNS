@@ -2,8 +2,8 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.20"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
 from jimgw.single_event.likelihood import HeterodynedTransientLikelihoodFD
@@ -80,73 +80,88 @@ tukey_alpha = 2 / (T / 2)
 
 ### Getting detector data
 
-# H1_frequency, H1_data_re, H1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_fd_strain.txt').T
-# H1_data = H1_data_re + 1j*H1_data_im
-# H1_psd_frequency, H1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt').T
+H1_frequency, H1_data_re, H1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_fd_strain.txt').T
+H1_data = H1_data_re + 1j*H1_data_im
+H1_psd_frequency, H1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt').T
 
-# H1_data = H1_data[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
-# H1_psd = H1_psd[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
-# H1_frequency = H1_frequency[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
+H1_data = H1_data[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
+H1_psd = H1_psd[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
+H1_frequency = H1_frequency[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
 
-# L1_frequency, L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_fd_strain.txt').T
-# L1_data = L1_data_re + 1j*L1_data_im
-# L1_psd_frequency, L1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt').T
+L1_frequency, L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_fd_strain.txt').T
+L1_data = L1_data_re + 1j*L1_data_im
+L1_psd_frequency, L1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt').T
 
-# L1_data = L1_data[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
-# L1_psd = L1_psd[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
-# L1_frequency = L1_frequency[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
+L1_data = L1_data[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
+L1_psd = L1_psd[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
+L1_frequency = L1_frequency[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
 
-# V1_frequency, V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_fd_strain.txt').T
-# V1_data = V1_data_re + 1j*V1_data_im
-# V1_psd_frequency, V1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_psd.txt').T
+V1_frequency, V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_fd_strain.txt').T
+V1_data = V1_data_re + 1j*V1_data_im
+V1_psd_frequency, V1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_psd.txt').T
 
-# V1_data = V1_data[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
-# V1_psd = V1_psd[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
-# V1_frequency = V1_frequency[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
+V1_data = V1_data[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
+V1_psd = V1_psd[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
+V1_frequency = V1_frequency[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
 
-# H1.frequencies = H1_frequency
-# H1.data = H1_data
-# H1.psd = H1_psd 
+H1.frequencies = H1_frequency
+H1.data = H1_data
+H1.psd = H1_psd 
 
-# L1.frequencies = L1_frequency
-# L1.data = L1_data
-# L1.psd = L1_psd 
+L1.frequencies = L1_frequency
+L1.data = L1_data
+L1.psd = L1_psd 
 
-# V1.frequencies = V1_frequency
-# V1.data = V1_data
-# V1.psd = V1_psd 
+V1.frequencies = V1_frequency
+V1.data = V1_data
+V1.psd = V1_psd 
 
-# Load the data
-H1.load_data_from_frame(trigger_time,
-                        duration-2,
-                        2,
-                        data_path + "H-H1_LOSC_CLN_16_V1-1187007040-2048.hdf5",
-                        "H1:LOSC-STRAIN",
-                        f_min=fmin,
-                        f_max=fmax,
-                        tukey_alpha = tukey_alpha,
-                        type = "hdf5")
+# # Load the data
+# H1.load_data_from_frame(trigger_time,
+#                         duration-2,
+#                         2,
+#                         data_path + "H-H1_LOSC_CLN_16_V1-1187007040-2048.hdf5",
+#                         "H1:LOSC-STRAIN",
+#                         f_min=fmin,
+#                         f_max=fmax,
+#                         tukey_alpha = tukey_alpha,
+#                         type = "hdf5")
 
-L1.load_data_from_frame(trigger_time,
-                        duration-2,
-                        2,
-                        data_path + "L-L1_LOSC_CLN_16_V1-1187007040-2048.hdf5",
-                        "L1:LOSC-STRAIN",
-                        f_min=fmin,
-                        f_max=fmax,
-                        tukey_alpha = tukey_alpha,
-                        type = "hdf5")
+# L1.load_data_from_frame(trigger_time,
+#                         duration-2,
+#                         2,
+#                         data_path + "L-L1_LOSC_CLN_16_V1-1187007040-2048.hdf5",
+#                         "L1:LOSC-STRAIN",
+#                         f_min=fmin,
+#                         f_max=fmax,
+#                         tukey_alpha = tukey_alpha,
+#                         type = "hdf5")
 
-V1.load_data_from_frame(trigger_time,
-                        duration-2,
-                        2,
-                        data_path + "V-V1_LOSC_CLN_16_V1-1187007040-2048.hdf5",
-                        "V1:LOSC-STRAIN",
-                        f_min=fmin,
-                        f_max=fmax,
-                        tukey_alpha = tukey_alpha,
-                        type = "hdf5")
+# V1.load_data_from_frame(trigger_time,
+#                         duration-2,
+#                         2,
+#                         data_path + "V-V1_LOSC_CLN_16_V1-1187007040-2048.hdf5",
+#                         "V1:LOSC-STRAIN",
+#                         f_min=fmin,
+#                         f_max=fmax,
+#                         tukey_alpha = tukey_alpha,
+#                         type = "hdf5")
 
+
+### This is our preprocessed data obtained from the TXT files at the GWOSC website (the GWF gave me NaNs?)
+H1.frequencies = np.genfromtxt(f'{data_path}H1_freq.txt')
+H1_data_re, H1_data_im = np.genfromtxt(f'{data_path}H1_data_re.txt'), np.genfromtxt(f'{data_path}H1_data_im.txt')
+H1.data = H1_data_re + 1j * H1_data_im
+
+L1.frequencies = np.genfromtxt(f'{data_path}L1_freq.txt')
+L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}L1_data_re.txt'), np.genfromtxt(f'{data_path}L1_data_im.txt')
+L1.data = L1_data_re + 1j * L1_data_im
+
+V1.frequencies = np.genfromtxt(f'{data_path}V1_freq.txt')
+V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}V1_data_re.txt'), np.genfromtxt(f'{data_path}V1_data_im.txt')
+V1.data = V1_data_re + 1j * V1_data_im
+
+# Load the PSD
 
 H1.psd = H1.load_psd(H1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt")
 L1.psd = L1.load_psd(L1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt")
@@ -222,38 +237,25 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
 
-# These are from the Chris directory run
-# ref_params = {'M_c': 1.19754357, 
-#               'eta': 0.24984541, 
-#               's1_z': -0.00429651, 
-#               's2_z': 0.00470304, 
-#               'lambda_1': 1816.51300368, 
-#               'lambda_2': 0.10161503, 
-#               'd_L': 10.87770389, 
-#               't_c': 0.00864911, 
-#               'phase_c': 4.33436689, 
-#               'iota': 1.59216065, 
-#               'psi': 1.69112445, 
-#               'ra': 5.08658471, 
-#               'dec': 0.47136332
-# }
-
-ref_params = {'M_c': 1.19754357, 
-              'eta': 0.24984541, 
-              's1_z': -0.00429651, 
-              's2_z': 0.00470304, 
-              'lambda_1': 1816.51300368, 
-              'lambda_2': 0.10161503, 
-              'd_L': 10.87770389, 
-              't_c': 0.00864911, 
-              'phase_c': 4.33436689, 
-              'iota': 1.59216065, 
-              'psi': 1.69112445, 
-              'ra': 5.08658471, 
-              'dec': 0.47136332
+ref_params = {
+    'M_c': 1.19793583,
+    'eta': 0.24794374,
+    's1_z': 0.00220637,
+    's2_z': 0.05,
+    'lambda_1': 105.12916663,
+    'lambda_2': 0.0,
+    'd_L': 45.41592353,
+    't_c': 0.00220588,
+    'phase_c': 5.76822606,
+    'iota': 2.46158044,
+    'psi': 2.09118099,
+    'ra': 5.03335133,
+    'dec': 0.01679998
 }
 
-n_bins = 100
+
+n_bins = 200
+
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleTaylorF2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
