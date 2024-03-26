@@ -1,0 +1,82 @@
+Tue Mar 26 16:51:19 CET 2024
+[cuda(id=0)]
+Initializing heterodyned likelihood..
+Finding reference parameters..
+Using provided reference parameters:
+ref_params
+{'M_c': 1.19793583, 'eta': 0.24794374, 's1_z': 0.00220637, 's2_z': 0.05, 'lambda_1': 105.12916663, 'lambda_2': 0.0, 'd_L': 45.41592353, 't_c': 0.00220588, 'phase_c': 5.76822606, 'iota': 2.46158044, 'psi': 2.09118099, 'ra': 5.03335133, 'dec': 0.01679998}
+Constructing reference waveforms..
+Running with n_bins  =  100
+INFO: Using MALA as local sampler
+No autotune found, use input sampler_params
+Compiling MALA body
+Training normalizing flow
+Tuning global sampler:   0%|          | 0/200 [00:00<?, ?it/s]Tuning global sampler:   0%|          | 1/200 [00:53<2:58:35, 53.85s/it]Tuning global sampler:   1%|          | 2/200 [00:58<1:21:59, 24.85s/it]Tuning global sampler:   2%|▏         | 3/200 [01:02<51:02, 15.54s/it]  Tuning global sampler:   2%|▏         | 4/200 [01:07<36:31, 11.18s/it]Tuning global sampler:   2%|▎         | 5/200 [01:11<28:32,  8.78s/it]Tuning global sampler:   3%|▎         | 6/200 [01:16<24:03,  7.44s/it]Tuning global sampler:   4%|▎         | 7/200 [01:21<20:52,  6.49s/it]Tuning global sampler:   4%|▍         | 8/200 [01:25<18:42,  5.85s/it]Tuning global sampler:   4%|▍         | 9/200 [01:30<17:15,  5.42s/it]Tuning global sampler:   5%|▌         | 10/200 [01:34<16:04,  5.08s/it]Tuning global sampler:   6%|▌         | 11/200 [01:39<15:28,  4.91s/it]Tuning global sampler:   6%|▌         | 12/200 [01:43<15:19,  4.89s/it]Tuning global sampler:   6%|▋         | 13/200 [01:48<14:55,  4.79s/it]Tuning global sampler:   7%|▋         | 14/200 [01:52<14:32,  4.69s/it]Tuning global sampler:   8%|▊         | 15/200 [01:57<14:18,  4.64s/it]Tuning global sampler:   8%|▊         | 16/200 [02:01<14:07,  4.60s/it]Tuning global sampler:   8%|▊         | 17/200 [02:06<13:58,  4.58s/it]Tuning global sampler:   9%|▉         | 18/200 [02:11<13:49,  4.56s/it]Tuning global sampler:  10%|▉         | 19/200 [02:15<14:02,  4.65s/it]Tuning global sampler:  10%|█         | 20/200 [02:20<13:52,  4.62s/it]Tuning global sampler:  10%|█         | 21/200 [02:24<13:44,  4.61s/it]Tuning global sampler:  11%|█         | 22/200 [02:29<13:33,  4.57s/it]Tuning global sampler:  12%|█▏        | 23/200 [02:34<13:28,  4.57s/it]Tuning global sampler:  12%|█▏        | 24/200 [02:38<13:22,  4.56s/it]Tuning global sampler:  12%|█▎        | 25/200 [02:43<13:38,  4.68s/it]Tuning global sampler:  13%|█▎        | 26/200 [02:48<13:27,  4.64s/it]Tuning global sampler:  14%|█▎        | 27/200 [02:52<13:17,  4.61s/it]Tuning global sampler:  14%|█▍        | 28/200 [02:57<13:10,  4.59s/it]Tuning global sampler:  14%|█▍        | 29/200 [03:01<13:03,  4.58s/it]Tuning global sampler:  15%|█▌        | 30/200 [03:06<12:54,  4.56s/it]Tuning global sampler:  16%|█▌        | 31/200 [03:11<13:07,  4.66s/it]Tuning global sampler:  16%|█▌        | 32/200 [03:15<12:57,  4.63s/it]Tuning global sampler:  16%|█▋        | 33/200 [03:20<12:48,  4.60s/it]Tuning global sampler:  17%|█▋        | 34/200 [03:24<12:32,  4.53s/it]Tuning global sampler:  18%|█▊        | 35/200 [03:29<12:21,  4.50s/it]Tuning global sampler:  18%|█▊        | 36/200 [03:33<12:12,  4.47s/it]Tuning global sampler:  18%|█▊        | 37/200 [03:38<12:24,  4.56s/it]Tuning global sampler:  19%|█▉        | 38/200 [03:42<12:12,  4.52s/it]Tuning global sampler:  20%|█▉        | 39/200 [03:47<12:02,  4.49s/it]Tuning global sampler:  20%|██        | 40/200 [03:51<11:54,  4.47s/it]Tuning global sampler:  20%|██        | 41/200 [03:55<11:49,  4.46s/it]Tuning global sampler:  21%|██        | 42/200 [04:00<11:41,  4.44s/it]Tuning global sampler:  22%|██▏       | 43/200 [04:04<11:35,  4.43s/it]Tuning global sampler:  22%|██▏       | 44/200 [04:09<11:48,  4.54s/it]Tuning global sampler:  22%|██▎       | 45/200 [04:13<11:35,  4.49s/it]Tuning global sampler:  23%|██▎       | 46/200 [04:18<11:25,  4.45s/it]Tuning global sampler:  24%|██▎       | 47/200 [04:22<11:18,  4.44s/it]Tuning global sampler:  24%|██▍       | 48/200 [04:27<11:12,  4.43s/it]Tuning global sampler:  24%|██▍       | 49/200 [04:31<11:07,  4.42s/it]Tuning global sampler:  25%|██▌       | 50/200 [04:35<11:02,  4.41s/it]Tuning global sampler:  26%|██▌       | 51/200 [04:40<10:57,  4.41s/it]Tuning global sampler:  26%|██▌       | 52/200 [04:45<11:09,  4.52s/it]Tuning global sampler:  26%|██▋       | 53/200 [04:49<10:59,  4.49s/it]Tuning global sampler:  27%|██▋       | 54/200 [04:53<10:51,  4.46s/it]Tuning global sampler:  28%|██▊       | 55/200 [04:58<10:44,  4.45s/it]Tuning global sampler:  28%|██▊       | 56/200 [05:02<10:39,  4.44s/it]Tuning global sampler:  28%|██▊       | 57/200 [05:07<10:34,  4.44s/it]Tuning global sampler:  29%|██▉       | 58/200 [05:11<10:47,  4.56s/it]Tuning global sampler:  30%|██▉       | 59/200 [05:16<10:37,  4.52s/it]Tuning global sampler:  30%|███       | 60/200 [05:20<10:25,  4.46s/it]Tuning global sampler:  30%|███       | 61/200 [05:25<10:17,  4.44s/it]Tuning global sampler:  31%|███       | 62/200 [05:29<10:11,  4.43s/it]Tuning global sampler:  32%|███▏      | 63/200 [05:33<10:05,  4.42s/it]Tuning global sampler:  32%|███▏      | 64/200 [05:38<10:01,  4.42s/it]Tuning global sampler:  32%|███▎      | 65/200 [05:43<10:13,  4.54s/it]Tuning global sampler:  33%|███▎      | 66/200 [05:47<10:03,  4.51s/it]Tuning global sampler:  34%|███▎      | 67/200 [05:51<09:55,  4.48s/it]Tuning global sampler:  34%|███▍      | 68/200 [05:56<09:47,  4.45s/it]Tuning global sampler:  34%|███▍      | 69/200 [06:00<09:42,  4.45s/it]Tuning global sampler:  35%|███▌      | 70/200 [06:05<09:36,  4.43s/it]Tuning global sampler:  36%|███▌      | 71/200 [06:09<09:30,  4.42s/it]Tuning global sampler:  36%|███▌      | 72/200 [06:14<09:41,  4.54s/it]Tuning global sampler:  36%|███▋      | 73/200 [06:18<09:32,  4.50s/it]Tuning global sampler:  37%|███▋      | 74/200 [06:23<09:23,  4.47s/it]Tuning global sampler:  38%|███▊      | 75/200 [06:27<09:14,  4.43s/it]Tuning global sampler:  38%|███▊      | 76/200 [06:31<09:08,  4.42s/it]Tuning global sampler:  38%|███▊      | 77/200 [06:36<09:04,  4.43s/it]Tuning global sampler:  39%|███▉      | 78/200 [06:40<09:00,  4.43s/it]Tuning global sampler:  40%|███▉      | 79/200 [06:45<08:55,  4.43s/it]Tuning global sampler:  40%|████      | 80/200 [06:50<09:07,  4.56s/it]Tuning global sampler:  40%|████      | 81/200 [06:54<08:57,  4.52s/it]Tuning global sampler:  41%|████      | 82/200 [06:59<08:49,  4.49s/it]Tuning global sampler:  42%|████▏     | 83/200 [07:03<08:43,  4.47s/it]Tuning global sampler:  42%|████▏     | 84/200 [07:07<08:37,  4.46s/it]Tuning global sampler:  42%|████▎     | 85/200 [07:12<08:31,  4.45s/it]Tuning global sampler:  43%|████▎     | 86/200 [07:16<08:25,  4.44s/it]Tuning global sampler:  44%|████▎     | 87/200 [07:21<08:35,  4.56s/it]Tuning global sampler:  44%|████▍     | 88/200 [07:25<08:26,  4.52s/it]Tuning global sampler:  44%|████▍     | 89/200 [07:30<08:18,  4.49s/it]Tuning global sampler:  45%|████▌     | 90/200 [07:34<08:10,  4.46s/it]Tuning global sampler:  46%|████▌     | 91/200 [07:39<08:02,  4.43s/it]Tuning global sampler:  46%|████▌     | 92/200 [07:43<07:57,  4.42s/it]Tuning global sampler:  46%|████▋     | 93/200 [07:47<07:52,  4.42s/it]Tuning global sampler:  47%|████▋     | 94/200 [07:52<07:48,  4.42s/it]Tuning global sampler:  48%|████▊     | 95/200 [07:57<07:59,  4.57s/it]Tuning global sampler:  48%|████▊     | 96/200 [08:01<07:49,  4.52s/it]Tuning global sampler:  48%|████▊     | 97/200 [08:06<07:41,  4.48s/it]Tuning global sampler:  49%|████▉     | 98/200 [08:10<07:34,  4.46s/it]Tuning global sampler:  50%|████▉     | 99/200 [08:14<07:29,  4.45s/it]Tuning global sampler:  50%|█████     | 100/200 [08:19<07:24,  4.45s/it]Tuning global sampler:  50%|█████     | 101/200 [08:23<07:20,  4.45s/it]Tuning global sampler:  51%|█████     | 102/200 [08:28<07:15,  4.44s/it]Tuning global sampler:  52%|█████▏    | 103/200 [08:33<07:25,  4.59s/it]Tuning global sampler:  52%|█████▏    | 104/200 [08:37<07:16,  4.54s/it]Tuning global sampler:  52%|█████▎    | 105/200 [08:42<07:07,  4.50s/it]Tuning global sampler:  53%|█████▎    | 106/200 [08:46<07:00,  4.47s/it]Tuning global sampler:  54%|█████▎    | 107/200 [08:50<06:54,  4.45s/it]Tuning global sampler:  54%|█████▍    | 108/200 [08:55<06:48,  4.44s/it]Tuning global sampler:  55%|█████▍    | 109/200 [08:59<06:43,  4.43s/it]Tuning global sampler:  55%|█████▌    | 110/200 [09:04<06:38,  4.42s/it]Tuning global sampler:  56%|█████▌    | 111/200 [09:08<06:33,  4.42s/it]Tuning global sampler:  56%|█████▌    | 112/200 [09:12<06:28,  4.41s/it]Tuning global sampler:  56%|█████▋    | 113/200 [09:17<06:39,  4.60s/it]Tuning global sampler:  57%|█████▋    | 114/200 [09:22<06:30,  4.54s/it]Tuning global sampler:  57%|█████▊    | 115/200 [09:26<06:22,  4.50s/it]Tuning global sampler:  58%|█████▊    | 116/200 [09:31<06:15,  4.47s/it]Tuning global sampler:  58%|█████▊    | 117/200 [09:35<06:09,  4.46s/it]Tuning global sampler:  59%|█████▉    | 118/200 [09:39<06:04,  4.44s/it]Tuning global sampler:  60%|█████▉    | 119/200 [09:44<05:59,  4.43s/it]Tuning global sampler:  60%|█████▉    | 119/200 [09:49<06:41,  4.95s/it]
+Early stopping: global acceptance target rate achieved
+Starting Production run
+Production run:   0%|          | 0/20 [00:00<?, ?it/s]Production run:   5%|▌         | 1/20 [00:00<00:10,  1.79it/s]Production run:  10%|█         | 2/20 [00:01<00:10,  1.79it/s]Production run:  15%|█▌        | 3/20 [00:01<00:09,  1.79it/s]Production run:  20%|██        | 4/20 [00:02<00:08,  1.79it/s]Production run:  25%|██▌       | 5/20 [00:02<00:08,  1.79it/s]Production run:  30%|███       | 6/20 [00:03<00:07,  1.79it/s]Production run:  35%|███▌      | 7/20 [00:03<00:07,  1.79it/s]Production run:  40%|████      | 8/20 [00:04<00:06,  1.79it/s]Production run:  45%|████▌     | 9/20 [00:05<00:06,  1.79it/s]Production run:  50%|█████     | 10/20 [00:05<00:05,  1.79it/s]Production run:  55%|█████▌    | 11/20 [00:06<00:05,  1.79it/s]Production run:  60%|██████    | 12/20 [00:06<00:04,  1.79it/s]Production run:  65%|██████▌   | 13/20 [00:07<00:03,  1.79it/s]Production run:  70%|███████   | 14/20 [00:07<00:03,  1.79it/s]Production run:  75%|███████▌  | 15/20 [00:08<00:02,  1.79it/s]Production run:  80%|████████  | 16/20 [00:08<00:02,  1.79it/s]Production run:  85%|████████▌ | 17/20 [00:09<00:01,  1.79it/s]Production run:  90%|█████████ | 18/20 [00:10<00:01,  1.79it/s]Production run:  95%|█████████▌| 19/20 [00:10<00:00,  1.79it/s]Production run: 100%|██████████| 20/20 [00:11<00:00,  1.79it/s]Production run: 100%|██████████| 20/20 [00:11<00:00,  1.79it/s]
+Training summary
+==========
+M_c: 1.197 +/- 0.002
+eta: 0.246 +/- 0.011
+s1_z: 0.018 +/- 0.022
+s2_z: -0.004 +/- 0.025
+lambda_1: 945.193 +/- 976.160
+lambda_2: 1312.242 +/- 1046.888
+d_L: 39.542 +/- 10.463
+t_c: 0.016 +/- 0.020
+phase_c: 2.674 +/- 1.613
+iota: 2.055 +/- 0.679
+psi: 1.822 +/- 0.880
+ra: 2.400 +/- 1.192
+dec: -0.026 +/- 0.404
+Log probability: 491.903 +/- 1139.258
+Local acceptance: 0.943 +/- 0.232
+Global acceptance: 0.016 +/- 0.127
+Max loss: 22.829, Min loss: -1.845
+Production summary
+==========
+M_c: 1.197 +/- 0.002
+eta: 0.245 +/- 0.012
+s1_z: 0.009 +/- 0.025
+s2_z: 0.004 +/- 0.027
+lambda_1: 543.364 +/- 653.267
+lambda_2: 885.650 +/- 794.846
+d_L: 31.418 +/- 9.948
+t_c: -0.000 +/- 0.013
+phase_c: 2.639 +/- 1.575
+iota: 2.319 +/- 0.360
+psi: 1.732 +/- 0.867
+ra: 3.393 +/- 0.393
+dec: -0.331 +/- 0.170
+Log probability: 332.617 +/- 7409.570
+Local acceptance: 0.898 +/- 0.302
+Global acceptance: 0.089 +/- 0.285
+Saving samples to ./outdir/results_training.npz
+Saving the NF
+Saving the jim hyperparameters
+Finished successfully
+Time taken: 739.4464099407196 seconds (12.324106832345327 minutes)
+Saving runtime
+Copying to: /home/twouters2/TurboPE-BNS/real_events//GW170817_TaylorF2/outdir_snellius/
+Directory created: /home/twouters2/TurboPE-BNS/real_events//GW170817_TaylorF2/outdir_snellius/
+First running ls:
+GW170817_snellius.py
+utils_plotting.py
+OK, copying now!
+DONE
+
+JOB STATISTICS
+==============
+Job ID: 5696615
+Cluster: snellius
+User/Group: twouters2/twouters2
+State: RUNNING
+Nodes: 1
+Cores per node: 18
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 03:48:54 core-walltime
+Job Wall-clock time: 00:12:43
+Memory Utilized: 0.00 MB (estimated maximum)
+Memory Efficiency: 0.00% of 10.00 GB (10.00 GB/node)
+WARNING: Efficiency statistics may be misleading for RUNNING jobs.
