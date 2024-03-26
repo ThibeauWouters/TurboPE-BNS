@@ -9,7 +9,7 @@ import json
 from ripple import get_chi_eff, Mc_eta_to_ms, lambda_tildes_to_lambdas, lambdas_to_lambda_tildes
 
 gwosc_path = "/home/thibeau.wouters/gw-datasets/GW190425/posterior_samples.h5"
-paths_dict = {"GW170817_TaylorF2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW170817_TaylorF2/outdir_copy/results_production.npz",
+paths_dict = {"GW170817_TaylorF2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW170817_TaylorF2/outdir/results_production.npz",
                     "bilby": "/home/thibeau.wouters/jim_pbilby_samples/GW170817/GW170817_TF2_result.json"},
                 
                 "GW170817_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW170817_NRTidalv2/outdir/results_production.npz",
@@ -44,6 +44,7 @@ LABELS = [r'$\mathcal{M}_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lamb
 ### RANGES ###
 
 def get_ranges_GW170817_TaylorF2(convert_chi, convert_lambdas):
+    return None
     if convert_chi and convert_lambdas:
         return [(1.197275, 1.19779),
                 (0.55, 1.0),

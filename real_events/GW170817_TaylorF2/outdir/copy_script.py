@@ -2,7 +2,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.20"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
@@ -120,38 +120,37 @@ tukey_alpha = 2 / (T / 2)
 H1.load_data_from_frame(trigger_time,
                         duration-2,
                         2,
-                        data_path + "H-H1_LOSC_CLN_4_V1-1187007040-2048.gwf",
+                        data_path + "H-H1_LOSC_CLN_16_V1-1187007040-2048.hdf5",
                         "H1:LOSC-STRAIN",
                         f_min=fmin,
                         f_max=fmax,
-                        tukey_alpha = tukey_alpha)
+                        tukey_alpha = tukey_alpha,
+                        type = "hdf5")
 
 L1.load_data_from_frame(trigger_time,
                         duration-2,
                         2,
-                        data_path + "L-L1_LOSC_CLN_4_V1-1187007040-2048.gwf",
+                        data_path + "L-L1_LOSC_CLN_16_V1-1187007040-2048.hdf5",
                         "L1:LOSC-STRAIN",
                         f_min=fmin,
                         f_max=fmax,
-                        tukey_alpha = tukey_alpha)
+                        tukey_alpha = tukey_alpha,
+                        type = "hdf5")
 
 V1.load_data_from_frame(trigger_time,
                         duration-2,
                         2,
-                        data_path + "V-V1_LOSC_CLN_4_V1-1187007040-2048.gwf",
+                        data_path + "V-V1_LOSC_CLN_16_V1-1187007040-2048.hdf5",
                         "V1:LOSC-STRAIN",
                         f_min=fmin,
                         f_max=fmax,
-                        tukey_alpha = tukey_alpha)
+                        tukey_alpha = tukey_alpha,
+                        type = "hdf5")
 
 
 H1.psd = H1.load_psd(H1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt")
 L1.psd = L1.load_psd(L1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt")
 V1.psd = V1.load_psd(V1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_psd.txt")
-
-# H1.psd = H1.load_psd(H1.frequencies, psd_file = data_path + "GW170817_h1_psd.txt")
-# L1.psd = L1.load_psd(L1.frequencies, psd_file = data_path + "GW170817_l1_psd.txt")
-# V1.psd = V1.load_psd(V1.frequencies, psd_file = data_path + "GW170817_v1_psd.txt")
 
 ### Define priors
 
