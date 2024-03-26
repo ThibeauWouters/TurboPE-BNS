@@ -76,44 +76,82 @@ duration = T
 post_trigger_duration = 2
 epoch = duration - post_trigger_duration
 f_ref = fmin 
+tukey_alpha = 2 / (T / 2)
 
 ### Getting detector data
 
-H1_frequency, H1_data_re, H1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_fd_strain.txt').T
-H1_data = H1_data_re + 1j*H1_data_im
-H1_psd_frequency, H1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt').T
+# H1_frequency, H1_data_re, H1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_fd_strain.txt').T
+# H1_data = H1_data_re + 1j*H1_data_im
+# H1_psd_frequency, H1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt').T
 
-H1_data = H1_data[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
-H1_psd = H1_psd[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
-H1_frequency = H1_frequency[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
+# H1_data = H1_data[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
+# H1_psd = H1_psd[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
+# H1_frequency = H1_frequency[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
 
-L1_frequency, L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_fd_strain.txt').T
-L1_data = L1_data_re + 1j*L1_data_im
-L1_psd_frequency, L1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt').T
+# L1_frequency, L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_fd_strain.txt').T
+# L1_data = L1_data_re + 1j*L1_data_im
+# L1_psd_frequency, L1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt').T
 
-L1_data = L1_data[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
-L1_psd = L1_psd[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
-L1_frequency = L1_frequency[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
+# L1_data = L1_data[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
+# L1_psd = L1_psd[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
+# L1_frequency = L1_frequency[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
 
-V1_frequency, V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_fd_strain.txt').T
-V1_data = V1_data_re + 1j*V1_data_im
-V1_psd_frequency, V1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_psd.txt').T
+# V1_frequency, V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_fd_strain.txt').T
+# V1_data = V1_data_re + 1j*V1_data_im
+# V1_psd_frequency, V1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_psd.txt').T
 
-V1_data = V1_data[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
-V1_psd = V1_psd[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
-V1_frequency = V1_frequency[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
+# V1_data = V1_data[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
+# V1_psd = V1_psd[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
+# V1_frequency = V1_frequency[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
 
-H1.frequencies = H1_frequency
-H1.data = H1_data
-H1.psd = H1_psd 
+# H1.frequencies = H1_frequency
+# H1.data = H1_data
+# H1.psd = H1_psd 
 
-L1.frequencies = L1_frequency
-L1.data = L1_data
-L1.psd = L1_psd 
+# L1.frequencies = L1_frequency
+# L1.data = L1_data
+# L1.psd = L1_psd 
 
-V1.frequencies = V1_frequency
-V1.data = V1_data
-V1.psd = V1_psd 
+# V1.frequencies = V1_frequency
+# V1.data = V1_data
+# V1.psd = V1_psd 
+
+# Load the data
+H1.load_data_from_frame(trigger_time,
+                        duration-2,
+                        2,
+                        data_path + "H-H1_LOSC_CLN_4_V1-1187007040-2048.gwf",
+                        "H1:LOSC-STRAIN",
+                        f_min=fmin,
+                        f_max=fmax,
+                        tukey_alpha = tukey_alpha)
+
+L1.load_data_from_frame(trigger_time,
+                        duration-2,
+                        2,
+                        data_path + "L-L1_LOSC_CLN_4_V1-1187007040-2048.gwf",
+                        "L1:LOSC-STRAIN",
+                        f_min=fmin,
+                        f_max=fmax,
+                        tukey_alpha = tukey_alpha)
+
+V1.load_data_from_frame(trigger_time,
+                        duration-2,
+                        2,
+                        data_path + "V-V1_LOSC_CLN_4_V1-1187007040-2048.gwf",
+                        "V1:LOSC-STRAIN",
+                        f_min=fmin,
+                        f_max=fmax,
+                        tukey_alpha = tukey_alpha)
+
+
+H1.psd = H1.load_psd(H1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt")
+L1.psd = L1.load_psd(L1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt")
+V1.psd = V1.load_psd(V1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_psd.txt")
+
+# H1.psd = H1.load_psd(H1.frequencies, psd_file = data_path + "GW170817_h1_psd.txt")
+# L1.psd = L1.load_psd(L1.frequencies, psd_file = data_path + "GW170817_l1_psd.txt")
+# V1.psd = V1.load_psd(V1.frequencies, psd_file = data_path + "GW170817_v1_psd.txt")
 
 ### Define priors
 
@@ -129,8 +167,8 @@ s1z_prior = Uniform(-0.05, 0.05, naming=["s1_z"])
 s2z_prior = Uniform(-0.05, 0.05, naming=["s2_z"])
 lambda_1_prior = Uniform(0.0, 5000.0, naming=["lambda_1"])
 lambda_2_prior = Uniform(0.0, 5000.0, naming=["lambda_2"])
-# dL_prior       = Uniform(1.0, 75.0, naming=["d_L"])
-dL_prior       = PowerLaw(1.0, 75.0, 2.0, naming=["d_L"])
+dL_prior       = Uniform(1.0, 75.0, naming=["d_L"])
+# dL_prior       = PowerLaw(1.0, 75.0, 2.0, naming=["d_L"])
 t_c_prior      = Uniform(-0.1, 0.1, naming=["t_c"])
 phase_c_prior  = Uniform(0.0, 2 * jnp.pi, naming=["phase_c"])
 cos_iota_prior = Uniform(
@@ -276,7 +314,7 @@ outdir_name = "./outdir/"
 jim = Jim(
     likelihood,
     prior,
-    n_loop_training=300,
+    n_loop_training=400,
     n_loop_production=20,
     n_local_steps=10,
     n_global_steps=300,
@@ -296,7 +334,7 @@ jim = Jim(
 ) # n_loops_maximize_likelihood = 2000, ## unused
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(42))
+jim.sample(jax.random.PRNGKey(41))
 ### Heavy computation ends
 
 # === Show results, save output ===

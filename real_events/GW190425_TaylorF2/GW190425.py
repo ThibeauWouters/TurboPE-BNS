@@ -77,7 +77,6 @@ post_trigger_duration = 2
 epoch = duration - post_trigger_duration
 f_ref = fmin
 tukey_alpha = 2 / (T / 2)
-print(tukey_alpha)
 
 ### Getting detector data
 

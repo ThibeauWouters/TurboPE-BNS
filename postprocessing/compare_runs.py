@@ -39,12 +39,12 @@ params = {
     # "axes.titlesize": 132,
     "text.usetex": True,
     "font.family": "times new roman",
-    'xtick.labelsize': 18,
-    'ytick.labelsize': 18
+    'xtick.labelsize': 20,
+    'ytick.labelsize': 20
 }
 plt.rcParams.update(params)
 
-label_fontsize = 32
+label_fontsize = 26
 default_corner_kwargs = dict(bins=40, 
                         smooth=1., 
                         show_titles=False,
@@ -160,6 +160,18 @@ def plot_comparison(jim_path: str,
     jim_samples = utils_compare_runs.preprocess_samples(jim_samples, convert_chi = convert_chi, convert_lambdas = convert_lambdas)
     bilby_samples = utils_compare_runs.preprocess_samples(bilby_samples, convert_chi = convert_chi, convert_lambdas = convert_lambdas)
     
+    print("jim_samples")
+    print(jim_samples)
+    
+    print("bilby_samples")
+    print(bilby_samples)
+    
+    # Drop NaNs
+    nan_idx_list = np.argwhere(np.isnan(bilby_samples))
+    nan_idx_list = np.unique(nan_idx_list[:, 0])
+    print("Dropping: ", nan_idx_list)
+    bilby_samples = np.delete(bilby_samples, nan_idx_list, axis=0)
+    
     # Remove the t_c label for comparison with bilby
     if remove_tc:
         labels = copy.deepcopy(LABELS)
@@ -185,17 +197,18 @@ def plot_comparison(jim_path: str,
     # result = plot_comparison_turbope(jim_samples, bilby_samples, labels,  save_name = save_name)
     
     # return result
-        
+    if "170817" in save_name:
+        labelpad = 0.25
+    else:
+        labelpad = 0.1
+    corner_kwargs["labelpad"] = labelpad
+    
     print(f"Saving plot of chains to {save_name}")
     plotsamples_list, dummy_values = get_plot_samples([jim_samples, bilby_samples], idx_list)
-    
-    # Dummy postprocessing
-    corner_kwargs["color"] = "white"
-    corner_kwargs["plot_contours"] = False
-    fig = corner.corner(dummy_values, alpha=0, hist_kwargs={'density': True, 'alpha': 0}, **corner_kwargs)
-    
+
     # Actual plotting
     hist_kwargs={'density': True, 'linewidth': 1.5}
+    contour_lw = 2
     for i, (samples, color) in enumerate(zip(plotsamples_list, [my_colors["jim"], my_colors["bilby"]])):
         corner_kwargs["color"] = color
         if i == 1:
@@ -205,7 +218,10 @@ def plot_comparison(jim_path: str,
             corner_kwargs["fill_contours"] = True
             corner_kwargs["plot_contours"] = True
             corner_kwargs["zorder"] = zorder
-            corner_kwargs["contour_kwargs"] = {"zorder": zorder}
+            corner_kwargs["alpha"] = 1
+            corner_kwargs["contour_kwargs"] = {"zorder": zorder,
+                                               "linewidths": contour_lw}
+            corner_kwargs["contourf_kwargs"] = {"zorder": zorder}
             
             hist_kwargs["fill"] = True
             hist_kwargs["facecolor"] = histogram_fill_color
@@ -214,23 +230,33 @@ def plot_comparison(jim_path: str,
         else:
             # jim kwargs
             zorder = 1e9
-            
             corner_kwargs["plot_contours"] = True
             corner_kwargs["fill_contours"] = False
             corner_kwargs["no_fill_contours"] = True
-            corner_kwargs["contour_kwargs"] = {"zorder": zorder}
+            corner_kwargs["alpha"] = 1
+            corner_kwargs["contour_kwargs"] = {"zorder": zorder, 
+                                               "linewidths": contour_lw}
+            corner_kwargs["contourf_kwargs"] = {"zorder": zorder}
             
             hist_kwargs["fill"] = False
             hist_kwargs["zorder"] = zorder
             hist_kwargs["color"] = color
         
-        corner.corner(samples, labels = labels, fig=fig, weights=weights, hist_kwargs=hist_kwargs, **corner_kwargs)
+        if i == 0:
+            fig = corner.corner(samples, labels = labels, weights=weights, hist_kwargs=hist_kwargs, **corner_kwargs)
+        else:
+            corner.corner(samples, labels = labels, fig=fig, weights=weights, hist_kwargs=hist_kwargs, **corner_kwargs)
     
-    # # Dummy postprocessing
-    # corner_kwargs["color"] = "white"
-    # corner_kwargs["plot_contours"] = False
-    # corner_kwargs["alpha"] = 0
-    # corner.corner(dummy_values, fig=fig, hist_kwargs={'density': True, 'alpha': 0}, **corner_kwargs)
+    # Dummy postprocessing
+    corner_kwargs["color"] = "white"
+    corner_kwargs["plot_contours"] = True
+    corner_kwargs["no_fill_contours"] = True
+    corner_kwargs["alpha"] = 0
+    corner_kwargs["contour_kwargs"] = {"zorder": 0.00001, 
+                                        "linewidths": 0.0,
+                                        "alpha": 0.0}
+    corner_kwargs["contourf_kwargs"] = {"zorder": 0.00001}
+    corner.corner(dummy_values, fig=fig, hist_kwargs={'density': True, 'alpha': 0}, **corner_kwargs)
     
     # TODO improve the plot, e.g. give a custom legend
     for ext in ["png", "pdf"]:
@@ -389,14 +415,16 @@ def main():
     start_time = time.time()
     save_path = "../figures/"
     convert_chi = True
-    convert_lambdas = False
+    convert_lambdas = True
     
     # events_to_plot = ["GW170817_TaylorF2",
     #                   "GW170817_NRTidalv2",
     #                   "GW190425_TaylorF2",
     #                   "GW190425_NRTidalv2"]
     
-    events_to_plot = ["GW170817_NRTidalv2"]
+    events_to_plot = ["GW170817_TaylorF2",
+                      "GW190425_TaylorF2"
+                      ]
     
     for event, paths in paths_dict.items():
         
@@ -426,7 +454,7 @@ def main():
         # Fetch the desired kwargs from the specified dict
         range = utils_compare_runs.get_ranges(event, convert_chi, convert_lambdas)
         corner_kwargs["range"] = range
-        idx_list = utils_compare_runs.get_idx_list(event, convert_chi = True, convert_lambdas = False)
+        idx_list = utils_compare_runs.get_idx_list(event, convert_chi = convert_chi, convert_lambdas = convert_chi)
         
         plot_comparison(jim_path, 
                         bilby_path, 
