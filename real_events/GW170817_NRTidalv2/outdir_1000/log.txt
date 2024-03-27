@@ -1,0 +1,60 @@
+d=0)]
+Initializing heterodyned likelihood..
+Finding reference parameters..
+Using provided reference parameters:
+ref_params
+{'M_c': 1.19754648, 'eta': 0.24994958, 's1_z': -0.02431239, 's2_z': 0.02297961, 'lambda_1': 1146.97930151, 'lambda_2': 1.56490691, 'd_L': 16.01717323, 't_c': 0.00205422, 'phase_c': $
+.14667506, 'iota': 1.92641014, 'psi': 0.02519606, 'ra': 3.39769149, 'dec': -0.34196637}
+Constructing reference waveforms..
+Running with n_bins  =  200
+INFO: Using MALA as local sampler
+No autotune found, use input sampler_params
+Training normalizing flow
+Tuning global sampler:   0%|                                      | 0/400 [00:00<?, ?it/s]Compiling MALA body
+Tuning global sampler:  16%|████▊                        | 66/400 [12:38<44:11,  7.94s/it]Early stopping: global acceptance target rate achieved
+Tuning global sampler:  16%|████▍                      | 66/400 [12:45<1:04:35, 11.60s/it]
+Starting Production run
+Production run: 100%|█████████████████████████████████████| 40/40 [01:21<00:00,  2.05s/it]
+Training summary
+==========
+M_c: 1.197 +/- 0.001
+eta: 0.246 +/- 0.012
+s1_z: 0.007 +/- 0.023
+s2_z: 0.010 +/- 0.026
+lambda_1: 1156.438 +/- 1110.605
+lambda_2: 1547.551 +/- 1148.720
+d_L: 43.279 +/- 11.484
+t_c: 0.035 +/- 0.012
+phase_c: 3.528 +/- 1.694
+iota: 1.353 +/- 0.806
+psi: 1.932 +/- 0.916
+ra: 1.263 +/- 0.788
+dec: 0.287 +/- 0.265
+Log probability: 436.269 +/- 2081.178
+Local acceptance: 0.929 +/- 0.256
+Global acceptance: 0.019 +/- 0.137
+Max loss: 137.887, Min loss: 2.571
+Production summary
+==========
+M_c: 1.198 +/- 0.000
+eta: 0.247 +/- 0.003
+s1_z: 0.012 +/- 0.024
+s2_z: 0.006 +/- 0.027
+lambda_1: 572.268 +/- 463.256
+lambda_2: 973.524 +/- 754.429
+d_L: 40.514 +/- 8.931
+t_c: 0.037 +/- 0.002
+phase_c: 3.079 +/- 1.804
+iota: 0.769 +/- 0.352
+psi: 1.624 +/- 0.885
+ra: 1.011 +/- 0.158
+dec: 0.238 +/- 0.079
+Log probability: 511.390 +/- 2.217
+Local acceptance: 0.927 +/- 0.260
+Global acceptance: 0.119 +/- 0.324
+Saving samples to ./outdir/results_training.npz
+Saving the NF
+Saving the jim hyperparameters
+Finished successfully
+Time taken: 1032.1237676143646 seconds (17.202062793572743 minutes)
+Saving runtime
