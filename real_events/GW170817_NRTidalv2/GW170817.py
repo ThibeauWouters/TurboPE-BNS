@@ -175,7 +175,7 @@ ref_params = {
     's2_z': 0.04888488,
     'lambda_1': 791.04366468,
     'lambda_2': 891.04366468,
-    'd_L': 36.06331818,
+    'd_L': 16.06331818,
     't_c': 0.00193536,
     'phase_c': 5.88649652,
     'iota': 1.93095421,
@@ -184,7 +184,7 @@ ref_params = {
     'dec': -0.34000186
 }
 
-n_bins = 200
+n_bins = 500
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
