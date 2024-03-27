@@ -4,34 +4,39 @@ Some utilities for fetching the correct parameters etc that I don't want to clut
 
 import numpy as np
 import jax.numpy as jnp
+import jax
+jax.config.update("jax_disable_jit", True)
+
 import h5py
 import json
 from ripple import get_chi_eff, Mc_eta_to_ms, lambda_tildes_to_lambdas, lambdas_to_lambda_tildes
 
 gwosc_path = "/home/thibeau.wouters/gw-datasets/GW190425/posterior_samples.h5"
-paths_dict = {"GW170817_TaylorF2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW170817_TaylorF2/outdir/results_production.npz",
-                    "bilby": "/home/thibeau.wouters/jim_pbilby_samples/GW170817/GW170817_TF2_result.json"},
-                
-                "GW170817_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW170817_NRTidalv2/outdir/results_production.npz",
-                    "bilby": "/home/thibeau.wouters/jim_pbilby_samples/GW170817/GW170817_IMRDNRTv2_older_bilby_result.json",
+jim_root_path = "/home/thibeau.wouters/TurboPE-BNS/real_events/"
+bilby_root_path = "/home/thibeau.wouters/jim_pbilby_samples/older_bilby_version/"
+paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/outdir/results_production.npz",
+                    "bilby": bilby_root_path + "GW170817_TF2_with_tukey_fix_result.json"},
+              
+              "GW170817_NRTidalv2": {"jim": jim_root_path + "GW170817_NRTidalv2/outdir/results_production.npz",
+                                     "bilby": bilby_root_path + "GW170817_IMRPhenomD_NRTidalv2_result.json",
                     },
-                
-                "GW190425_TaylorF2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_TaylorF2_redo/outdir/results_production.npz",
-                    "bilby": "/home/thibeau.wouters/jim_pbilby_samples/GW190425/GW190425_TF2_result.json",
+              
+              "GW190425_TaylorF2": {"jim": jim_root_path + "GW190425_TaylorF2/outdir/results_production.npz",
+                                    "bilby": bilby_root_path + "GW190425_TF2_with_tukey_fix_result.json",
                     },
-                
-                "GW190425_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_NRTidalv2/outdir/results_production.npz",
-                    "bilby": "/home/thibeau.wouters/jim_pbilby_samples/GW190425/GW190425_IMRDNRTv2_older_bilby_result.json",
+              
+              "GW190425_NRTidalv2": {"jim": jim_root_path + "GW190425_NRTidalv2/outdir/results_production.npz",
+                                     "bilby": bilby_root_path + "GW190425_IMRPhenomD_NRTidalv2_result.json",
                     },
-                
-                # "GW190425_TaylorF2_online_data": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_TaylorF2_redo/outdir/results_production.npz",
-                #             "bilby": gwosc_path,
-                #             },
-                
-                # "GW190425_NRTidalv2_online_data": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_NRTidalv2/outdir/results_production.npz",
-                #             "bilby": gwosc_path,
-                #             }
 }
+
+# "GW190425_TaylorF2_online_data": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_TaylorF2_redo/outdir/results_production.npz",
+#             "bilby": gwosc_path,
+#             },
+
+# "GW190425_NRTidalv2_online_data": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_NRTidalv2/outdir/results_production.npz",
+#             "bilby": gwosc_path,
+#             }
 
 jim_naming = ['M_c', 'q', 's1_z', 's2_z', 'lambda_1', 'lambda_2', 'd_L', 't_c', 'phase_c', 'cos_iota', 'psi', 'ra', 'sin_dec']
 
@@ -44,7 +49,6 @@ LABELS = [r'$\mathcal{M}_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lamb
 ### RANGES ###
 
 def get_ranges_GW170817_TaylorF2(convert_chi, convert_lambdas):
-    return None
     if convert_chi and convert_lambdas:
         return [(1.197275, 1.19779),
                 (0.55, 1.0),
@@ -57,37 +61,12 @@ def get_ranges_GW170817_TaylorF2(convert_chi, convert_lambdas):
                 (0.0, np.pi),
                 (3.35, 3.49),
                 (-0.5, -0.2)]
+    else:
+        return None
 
 def get_ranges_GW170817_NRTidalv2(convert_chi, 
                                   convert_lambdas):
     
-    if not convert_chi and not convert_lambdas:
-        return [(1.197275, 1.19779),
-                (0.55, 1.0),
-                (-0.05, 0.049),
-                (-0.05, 0.05),
-                (0.0, 1700.0),
-                (0.0, 2500.0),
-                (10.0, 50.0),
-                (0.0, 2 * np.pi),
-                (1.75, np.pi),
-                (0.0, np.pi),
-                (3.35, 3.49),
-                (-0.5, -0.2)]
-        
-    if convert_chi and not convert_lambdas:
-        return [(1.197275, 1.19779),
-                (0.55, 1.0),
-                (-0.015, 0.049),
-                (0.0, 1700.0),
-                (0.0, 2500.0),
-                (10.0, 50.0),
-                (0.0, 2 * np.pi),
-                (1.75, np.pi),
-                (0.0, np.pi),
-                (3.35, 3.49),
-                (-0.5, -0.2)]
-        
     if convert_chi and convert_lambdas:
         return [(1.197275, 1.19779),
                 (0.55, 1.0),
@@ -100,9 +79,24 @@ def get_ranges_GW170817_NRTidalv2(convert_chi,
                 (0.0, np.pi),
                 (3.35, 3.49),
                 (-0.5, -0.2)]
+    else:
+        return None
+        
       
 def get_ranges_GW190425_TaylorF2(convert_chi, convert_lambdas):
     if convert_chi and convert_lambdas:
+        return [(1.4862, 1.487525),
+                (0.61, 1.0),
+                (-0.02, 0.05),
+                (0.0, 2000.0),
+                (-700.0, 700.0),
+                (35.0, 240.0),
+                (0.0, 2*np.pi),
+                (0.0, np.pi),
+                (0.0, np.pi),
+                (0.0, 2*np.pi),
+                (- np.pi / 2, np.pi / 2)]
+    else:
         return None
       
 def get_ranges_GW190425_NRTidalv2(convert_chi, convert_lambdas):
