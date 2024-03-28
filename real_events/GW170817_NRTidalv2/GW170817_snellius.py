@@ -180,14 +180,13 @@ ref_params = {
     'dec': -0.34000186
 }
 
-n_bins = 100
-
+n_bins = 1000
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
 
-eps = 1e-2
+eps = 1e-3
 n_dim = 13
 mass_matrix = jnp.eye(n_dim)
 mass_matrix = mass_matrix.at[0,0].set(1e-5)
@@ -199,9 +198,9 @@ mass_matrix = mass_matrix.at[11,11].set(1e-2)
 mass_matrix = mass_matrix.at[12,12].set(1e-2)
 local_sampler_arg = {"step_size": mass_matrix * eps}
 
-# Build the learning rate scheduler
+# Build the learning rate scheduler (if used)
 
-n_loop_training = 200
+n_loop_training = 400
 n_epochs = 50
 total_epochs = n_epochs * n_loop_training
 start = int(total_epochs / 10)
@@ -213,18 +212,24 @@ schedule_fn = optax.polynomial_schedule(
 
 scheduler_str = f"polynomial_schedule({start_lr}, {end_lr}, {power}, {total_epochs-start}, {start})"
 
+# Choose between fixed learning rate - or - the above scheduler here
+
+# learning_rate = 1e-3
+learning_rate = schedule_fn
+
 # Create jim object
 
 outdir_name = "./outdir/"
+
 jim = Jim(
     likelihood,
     prior,
-    n_loop_training=n_loop_training,
+    n_loop_training=300,
     n_loop_production=20,
-    n_local_steps=5,
-    n_global_steps=400,
+    n_local_steps=10,
+    n_global_steps=300,
     n_chains=1000,
-    n_epochs=n_epochs,
+    n_epochs=100,
     learning_rate=schedule_fn,
     max_samples=50000,
     momentum=0.9,
@@ -236,7 +241,7 @@ jim = Jim(
     local_sampler_arg=local_sampler_arg,
     stopping_criterion_global_acc = 0.10,
     outdir_name=outdir_name
-)
+) # n_loops_maximize_likelihood = 2000, ## unused
 
 ### Heavy computation begins
 jim.sample(jax.random.PRNGKey(41))
