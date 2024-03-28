@@ -11,12 +11,16 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 
+
 import time
 import numpy as np
 import matplotlib.pyplot as plt 
+import matplotlib.lines as mlines
 import corner
 import h5py
 import jax.numpy as jnp
+import jax
+jax.config.update("jax_disable_jit", True)
 import json
 import copy
 from scipy.spatial.distance import jensenshannon
@@ -166,11 +170,29 @@ def plot_comparison(jim_path: str,
     print("bilby_samples")
     print(bilby_samples)
     
-    # Drop NaNs
+    # Drop NaNs:
     nan_idx_list = np.argwhere(np.isnan(bilby_samples))
     nan_idx_list = np.unique(nan_idx_list[:, 0])
-    print("Dropping: ", nan_idx_list)
+    print("Dropping NaNs: ", nan_idx_list)
     bilby_samples = np.delete(bilby_samples, nan_idx_list, axis=0)
+    
+    # Drop infs:
+    inf_idx_list = np.argwhere(np.isinf(bilby_samples))
+    inf_idx_list = np.unique(inf_idx_list[:, 0])
+    print("Dropping infs: ", inf_idx_list)
+    bilby_samples = np.delete(bilby_samples, inf_idx_list, axis=0)
+    
+    # Same for jim samples:
+    nan_idx_list = np.argwhere(np.isnan(jim_samples))
+    nan_idx_list = np.unique(nan_idx_list[:, 0])
+    print("Dropping NaNs: ", nan_idx_list)
+    jim_samples = np.delete(jim_samples, nan_idx_list, axis=0)
+    
+    # Drop infs:
+    inf_idx_list = np.argwhere(np.isinf(jim_samples))
+    inf_idx_list = np.unique(inf_idx_list[:, 0])
+    print("Dropping infs: ", inf_idx_list)
+    jim_samples = np.delete(jim_samples, inf_idx_list, axis=0)
     
     # Remove the t_c label for comparison with bilby
     if remove_tc:
@@ -205,7 +227,7 @@ def plot_comparison(jim_path: str,
     
     print(f"Saving plot of chains to {save_name}")
     plotsamples_list, dummy_values = get_plot_samples([jim_samples, bilby_samples], idx_list)
-
+    
     # Actual plotting
     hist_kwargs={'density': True, 'linewidth': 1.5}
     contour_lw = 2
@@ -258,76 +280,20 @@ def plot_comparison(jim_path: str,
     corner_kwargs["contourf_kwargs"] = {"zorder": 0.00001}
     corner.corner(dummy_values, fig=fig, hist_kwargs={'density': True, 'alpha': 0}, **corner_kwargs)
     
-    # TODO improve the plot, e.g. give a custom legend
+    # Add a custom legend
+    legend_lw = 2
+    legend_elements = [
+        mlines.Line2D([], [], color=my_colors["jim"], linewidth = legend_lw, label=r'\textsc{Jim}'),
+        mlines.Line2D([], [], color=my_colors["bilby"], linewidth = legend_lw, label=r'\textsc{pBilby}')
+    ]
+
+    # Create the legend
+    fig.legend(handles=legend_elements, bbox_to_anchor=(0.925, 0.925), fontsize=40, frameon = False) 
+    
     for ext in ["png", "pdf"]:
         plt.savefig(f"{save_name}.{ext}", bbox_inches='tight')
     plt.close()
     
-def plot_comparison_turbope(jim_chains: np.array, 
-                            bilby_chains: np.array, 
-                            labels: list[str],
-                            nsamp: int = 4000, 
-                            cline=sns.color_palette(desat=0.5)[0], 
-                            lims: list[float]=None,
-                            save_name = "corner_comparison"
-                            ): # rng=None
-    
-    # This is the same as the previous function, but with the setup and plotting taken from TurboPE
-    nsamp = min([nsamp, len(jim_chains), len(jim_chains)])
-    # TODO: change this manual override!
-    nsamp = 100
-    
-    print("nsamp")
-    print(nsamp)
-    
-    
-    # Downsample the jim and bilby chains with nsamp:
-    jim_chains = jim_chains[np.random.choice(jim_chains.shape[0], nsamp, replace=False), :]
-    bilby_chains = bilby_chains[np.random.choice(bilby_chains.shape[0], nsamp, replace=False), :]
-    
-    print("Constructing dfs")
-    df1 = pd.DataFrame(jim_chains, columns=labels)#.sample(nsamp)
-    df2 = pd.DataFrame(bilby_chains, columns=labels)#.sample(nsamp)
-    print("Constructing dfs DONE")
-
-    print("Preparing the plots")
-    g = sns.PairGrid(df2, corner=True, diag_sharey=False)
-    g.map_diag(sns.histplot, color='gray', alpha=0.4, element='step', fill=True)
-    g.map_lower(sns.kdeplot, color='gray', alpha=0.4, levels=5, fill=True)
-
-    g.data = df1
-    g.map_diag(sns.histplot, color=cline, element='step', linewidth=2, fill=False)
-    g.map_lower(sns.kdeplot, color=cline, levels=5, linewidths=2)
-    print("Preparing the plots DONE")
-
-    # set axis limits
-    if lims is not None:
-        for i, axes in enumerate(g.axes):
-            for j, ax in enumerate(axes):
-                if ax is not None:
-                    if lims[j]:
-                        ax.set_xlim(lims[j])
-                    if lims[i] and i != j:
-                        ax.set_ylim(lims[i])
-    
-    # add legend
-    ax = g.axes[0,0]
-    legend_lw = 5
-    ax.plot([], [], color=cline, lw=legend_lw, label=r"\texttt{jim}")
-    ax.plot([], [], color='gray', alpha=0.4, lw=legend_lw, label="\texttt{pbilby}")
-    ax.legend(loc='center left', bbox_to_anchor=(1.25, 0.5), frameon=False,
-              fontsize=20)
-    
-    # Save the figure
-    print("Saving figure")
-    for ext in ["png", "pdf"]:
-        this_save_name = f"{save_name}.{ext}"
-        print(f"Saving to: {this_save_name}")
-        plt.savefig(this_save_name, bbox_inches='tight')
-        
-    print("Saving figure : DONE")
-    
-    return g
 
 def compare_bilby_runs(peter_path: str, 
                        gwosc_path: str, 
@@ -387,7 +353,7 @@ def compute_js_divergences(jim_chains: jnp.array,
         histogram_jim, edges = np.histogram(values_jim, bins=20, density=True)
         histogram_bilby, _ = np.histogram(values_bilby, bins=edges, density=True)
         
-        js_div = jensenshannon(histogram_jim, histogram_bilby) ** 2
+        js_div = jensenshannon(histogram_jim, histogram_bilby, base = 2) ** 2
         js_dict[parameter_name] = js_div
         
         plt.figure(figsize=(10, 6))
@@ -417,20 +383,15 @@ def main():
     convert_chi = True
     convert_lambdas = True
     
-    # events_to_plot = ["GW170817_TaylorF2",
-    #                   "GW170817_NRTidalv2",
-    #                   "GW190425_TaylorF2",
-    #                   "GW190425_NRTidalv2"]
+    events_to_plot = [
+        "GW170817_NRTidalv2",
+        "GW170817_TaylorF2",
+        "GW190425_TaylorF2",
+        "GW190425_NRTidalv2"
+]
     
-    events_to_plot = ["GW170817_TaylorF2",
-                      "GW190425_TaylorF2"
-                      ]
-    
-    for event, paths in paths_dict.items():
-        
-        # Skip the paths that we are not going to plot
-        if event not in events_to_plot:
-            continue
+    for event in events_to_plot:
+        paths = paths_dict[event]
         
         print("==============================================")
         print(f"Comparing runs for: {event}")
@@ -453,6 +414,8 @@ def main():
         
         # Fetch the desired kwargs from the specified dict
         range = utils_compare_runs.get_ranges(event, convert_chi, convert_lambdas)
+        print("range")
+        print(range)
         corner_kwargs["range"] = range
         idx_list = utils_compare_runs.get_idx_list(event, convert_chi = convert_chi, convert_lambdas = convert_chi)
         
@@ -469,14 +432,14 @@ def main():
         
         # ====== Computing the JS divergences ======
         
-        # jim_chains = get_chains_jim(jim_path)
-        # bilby_chains = get_chains_bilby(bilby_path)
+        jim_chains = utils_compare_runs.get_chains_jim(jim_path)
+        bilby_chains = utils_compare_runs.get_chains_bilby(bilby_path)
         
-        # js_dict = compute_js_divergences(jim_chains,
-        #                                  bilby_chains, 
-        #                                  plot_name = event)
+        js_dict = compute_js_divergences(jim_chains,
+                                         bilby_chains, 
+                                         plot_name = event)
         
-        # print(js_dict)
+        print(js_dict)
         
         
     # ====== Compare the bilby runs ======

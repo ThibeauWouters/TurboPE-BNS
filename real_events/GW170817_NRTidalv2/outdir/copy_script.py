@@ -79,41 +79,24 @@ f_ref = fmin
 
 ### Getting detector data
 
-H1_frequency, H1_data_re, H1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_fd_strain.txt').T
-H1_data = H1_data_re + 1j*H1_data_im
-H1_psd_frequency, H1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt').T
+# This is our preprocessed data obtained from the TXT files at the GWOSC website (the GWF gave me NaNs?)
+H1.frequencies = np.genfromtxt(f'{data_path}H1_freq.txt')
+H1_data_re, H1_data_im = np.genfromtxt(f'{data_path}H1_data_re.txt'), np.genfromtxt(f'{data_path}H1_data_im.txt')
+H1.data = H1_data_re + 1j * H1_data_im
 
-H1_data = H1_data[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
-H1_psd = H1_psd[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
-H1_frequency = H1_frequency[(H1_frequency>minimum_frequency)*(H1_frequency<maximum_frequency)]
+L1.frequencies = np.genfromtxt(f'{data_path}L1_freq.txt')
+L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}L1_data_re.txt'), np.genfromtxt(f'{data_path}L1_data_im.txt')
+L1.data = L1_data_re + 1j * L1_data_im
 
-L1_frequency, L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_fd_strain.txt').T
-L1_data = L1_data_re + 1j*L1_data_im
-L1_psd_frequency, L1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt').T
+V1.frequencies = np.genfromtxt(f'{data_path}V1_freq.txt')
+V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}V1_data_re.txt'), np.genfromtxt(f'{data_path}V1_data_im.txt')
+V1.data = V1_data_re + 1j * V1_data_im
 
-L1_data = L1_data[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
-L1_psd = L1_psd[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
-L1_frequency = L1_frequency[(L1_frequency>minimum_frequency)*(L1_frequency<maximum_frequency)]
+# Load the PSD
 
-V1_frequency, V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_fd_strain.txt').T
-V1_data = V1_data_re + 1j*V1_data_im
-V1_psd_frequency, V1_psd = np.genfromtxt(f'{data_path}GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_psd.txt').T
-
-V1_data = V1_data[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
-V1_psd = V1_psd[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
-V1_frequency = V1_frequency[(V1_frequency>minimum_frequency)*(V1_frequency<maximum_frequency)]
-
-H1.frequencies = H1_frequency
-H1.data = H1_data
-H1.psd = H1_psd 
-
-L1.frequencies = L1_frequency
-L1.data = L1_data
-L1.psd = L1_psd 
-
-V1.frequencies = V1_frequency
-V1.data = V1_data
-V1.psd = V1_psd 
+H1.psd = H1.load_psd(H1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt")
+L1.psd = L1.load_psd(L1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt")
+V1.psd = V1.load_psd(V1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_psd.txt")
 
 ### Define priors
 
@@ -185,39 +168,23 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
 
-
-# ref_params = {'M_c': 1.19754357, 
-#               'eta': 0.24984541, 
-#               's1_z': -0.00429651, 
-#               's2_z': 0.00470304, 
-#               'lambda_1': 1816.51300368, 
-#               'lambda_2': 0.10161503, 
-#               'd_L': 10.87770389, 
-#               't_c': 0.00864911, 
-#               'phase_c': 4.33436689, 
-#               'iota': 1.59216065, 
-#               'psi': 1.69112445, 
-#               'ra': 5.08658471, 
-#               'dec': 0.47136332
-# }
-
 ref_params = {
-    'M_c': 1.19754648,
-    'eta': 0.24994958,
-    's1_z': -0.02431239,
-    's2_z': 0.02297961,
-    'lambda_1': 1146.97930151,
-    'lambda_2': 1.56490691,
-    'd_L': 16.01717323,
-    't_c': 0.00205422,
-    'phase_c': 1.14667506,
-    'iota': 1.92641014,
-    'psi': 0.02519606,
-    'ra': 3.39769149,
-    'dec': -0.34196637
+    'M_c': 1.1975896,
+    'eta': 0.2461001,
+    's1_z': -0.01890608,
+    's2_z': 0.04888488,
+    'lambda_1': 791.04366468,
+    'lambda_2': 891.04366468,
+    'd_L': 16.06331818,
+    't_c': 0.00193536,
+    'phase_c': 5.88649652,
+    'iota': 1.93095421,
+    'psi': 1.59687217,
+    'ra': 3.39736826,
+    'dec': -0.34000186
 }
 
-n_bins = 200
+n_bins = 1000
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
@@ -281,7 +248,7 @@ jim = Jim(
 ) # n_loops_maximize_likelihood = 2000, ## unused
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(42))
+jim.sample(jax.random.PRNGKey(41))
 ### Heavy computation ends
 
 # === Show results, save output ===
