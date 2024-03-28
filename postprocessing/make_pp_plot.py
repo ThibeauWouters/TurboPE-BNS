@@ -14,7 +14,7 @@ from matplotlib.lines import Line2D
 from ripple import get_chi_eff, Mc_eta_to_ms
 from tqdm import tqdm
 
-fs = 26
+fs = 32
 matplotlib_params = {"axes.grid": True,
           "text.usetex" : True,
           "font.family" : "serif",
@@ -289,7 +289,7 @@ def make_pp_plot(percentile_dict: dict,
     alpha_list = np.linspace(min_alpha, max_alpha, len(percentile_list))
     alpha_list = alpha_list[::-1]
         
-    plt.figure(figsize=(16, 8))    
+    plt.figure(figsize=(14, 10))    
     # Plot the shadow bands
     for percentile, alpha in zip(percentile_list, alpha_list):
         
@@ -366,18 +366,21 @@ def make_pp_plot(percentile_dict: dict,
     lower_right_colors = saved_colors[6:]
     lower_right_linestyles = saved_linestyles[6:]
 
-    # Create Line2D objects for upper left legend
-    upper_left_handles = [Line2D([0], [0], color=color, linestyle=linestyle) for color, linestyle in zip(upper_left_colors, upper_left_linestyles)]
-
-    # Create Line2D objects for lower right legend
-    legend_fontsize = 32
-    handlelength = 1.0
+    # Create the handles
     lw_legend = 3.0
     lower_right_handles = [Line2D([0], [0], color=color, linestyle=linestyle, linewidth=lw_legend) for color, linestyle in zip(lower_right_colors, lower_right_linestyles)]
-
-    leg1 = plt.legend(upper_left_handles, upper_left_labels, loc='upper left', fontsize=legend_fontsize, handlelength=handlelength)
-    leg2 = plt.legend(lower_right_handles, lower_right_labels, loc='lower right', fontsize=legend_fontsize, handlelength=handlelength)
     
+    upper_left_handles = [Line2D([0], [0], color=color, linestyle=linestyle, linewidth=lw_legend) for color, linestyle in zip(upper_left_colors, upper_left_linestyles)]
+
+    legend_kwargs = {"fontsize": 32, 
+                     "handlelength": 0.8,
+                     "frameon": False,
+                     "handletextpad": 0.5}
+
+    eps_x = 0.0175
+    eps_y = 0.02
+    leg1 = plt.legend(upper_left_handles, upper_left_labels, loc = "upper left", bbox_to_anchor = (-eps_x, 1.0 + eps_y), **legend_kwargs)
+    leg2 = plt.legend(lower_right_handles, lower_right_labels, loc = "lower right", bbox_to_anchor = (1.0 + eps_x, -eps_y), **legend_kwargs)
     
     plt.gca().add_artist(leg1)
     plt.gca().add_artist(leg2)
@@ -399,8 +402,9 @@ def make_pp_plot(percentile_dict: dict,
     print("Saving pp-plot")
     plt.grid(False) # disable grida
     plt.title(title_string)
-    plt.xlim(0, 1)
-    plt.ylim(0, 1)
+    xlim_eps = 1e-4
+    plt.xlim(xlim_eps, 1)
+    plt.ylim(xlim_eps, 1)
     
     for ext in [".png", ".pdf"]:
         full_savename = save_name + ext
