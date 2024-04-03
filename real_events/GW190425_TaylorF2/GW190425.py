@@ -80,27 +80,40 @@ tukey_alpha = 2 / (T / 2)
 
 ### Getting detector data
 
-# Load the data
-L1.load_data(trigger_time=trigger_time,
-             gps_start_pad=duration-2,
-             gps_end_pad=2,
-             f_min=fmin,
-             f_max=fmax,
-             tukey_alpha = tukey_alpha,
-             load_psd = False)
+# # Load the data
+# L1.load_data(trigger_time=trigger_time,
+#              gps_start_pad=duration-2,
+#              gps_end_pad=2,
+#              f_min=fmin,
+#              f_max=fmax,
+#              tukey_alpha = tukey_alpha,
+#              load_psd = False)
 
-V1.load_data(trigger_time=trigger_time,
-             gps_start_pad=duration-2,
-             gps_end_pad=2,
-             f_min=fmin,
-             f_max=fmax,
-             tukey_alpha = tukey_alpha,
-             load_psd = False)
+# V1.load_data(trigger_time=trigger_time,
+#              gps_start_pad=duration-2,
+#              gps_end_pad=2,
+#              f_min=fmin,
+#              f_max=fmax,
+#              tukey_alpha = tukey_alpha,
+#              load_psd = False)
+
+# L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
+# V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
+
+### This is our preprocessed data obtained from the TXT files at the GWOSC website (the GWF gave me NaNs?)
+L1.frequencies = np.genfromtxt(f'{data_path}L1_freq.txt')
+L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}L1_data_re.txt'), np.genfromtxt(f'{data_path}L1_data_im.txt')
+L1.data = L1_data_re + 1j * L1_data_im
+
+V1.frequencies = np.genfromtxt(f'{data_path}V1_freq.txt')
+V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}V1_data_re.txt'), np.genfromtxt(f'{data_path}V1_data_im.txt')
+V1.data = V1_data_re + 1j * V1_data_im
+
+# Load the PSD
 
 L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
 V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
-### Define priors
 
 # Internal parameters
 Mc_prior = Uniform(1.485, 1.490, naming=["M_c"])
@@ -238,7 +251,7 @@ jim = Jim(
     train_thinning=10,
     output_thinning=30,    
     local_sampler_arg=local_sampler_arg,
-    stopping_criterion_global_acc = 0.25,
+    stopping_criterion_global_acc = 0.10,
     outdir_name=outdir_name
 )
 

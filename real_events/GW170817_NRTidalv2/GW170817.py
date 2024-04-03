@@ -2,7 +2,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.15"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
@@ -184,7 +184,9 @@ ref_params = {
     'dec': -0.34000186
 }
 
-n_bins = 1000
+ref_params = None
+n_bins = 100 # NOTE 1000 gives good results
+
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
@@ -245,10 +247,10 @@ jim = Jim(
     local_sampler_arg=local_sampler_arg,
     stopping_criterion_global_acc = 0.10,
     outdir_name=outdir_name
-) # n_loops_maximize_likelihood = 2000, ## unused
+)
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(41))
+jim.sample(jax.random.PRNGKey(0))
 ### Heavy computation ends
 
 # === Show results, save output ===

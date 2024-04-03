@@ -21,14 +21,23 @@ paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/ou
                                      "bilby": bilby_root_path + "GW170817_IMRPhenomD_NRTidalv2_result.json",
                     },
               
-              "GW190425_TaylorF2": {"jim": jim_root_path + "GW190425_TaylorF2/outdir/results_production.npz",
-                                    "bilby": bilby_root_path + "GW190425_TF2_with_tukey_fix_result.json",
+              "GW190425_TaylorF2": {"jim": jim_root_path + "GW190425_TaylorF2/outdir_gwosc_data/results_production.npz",
+                                    "bilby": bilby_root_path + "GW190425_GWOSC_data_result.json",
                     },
               
               "GW190425_NRTidalv2": {"jim": jim_root_path + "GW190425_NRTidalv2/outdir/results_production.npz",
                                      "bilby": bilby_root_path + "GW190425_IMRPhenomD_NRTidalv2_result.json",
                     },
 }
+
+### Old paths used for TF2 GW190425
+
+# "GW190425_TaylorF2": {"jim": jim_root_path + "GW190425_TaylorF2/outdir/results_production.npz",
+#                                     "bilby": bilby_root_path + "GW190425_TF2_with_tukey_fix_result.json",
+#                     },
+
+
+### Paths to compare Peter's result with the publicly available samples
 
 # "GW190425_TaylorF2_online_data": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_TaylorF2_redo/outdir/results_production.npz",
 #             "bilby": gwosc_path,
@@ -98,6 +107,22 @@ def get_ranges_GW190425_TaylorF2(convert_chi, convert_lambdas):
                 (- np.pi / 2, np.pi / 2)]
     else:
         return None
+    
+def get_ranges_GW190425_TaylorF2_GWOSC(convert_chi, convert_lambdas):
+    if convert_chi and convert_lambdas:
+        return [(1.4862, 1.487525),
+                (0.61, 1.0),
+                (-0.02, 0.05),
+                (0.0, 2000.0),
+                (-700.0, 700.0),
+                (35.0, 240.0),
+                (0.0, 2*np.pi),
+                (0.0, np.pi),
+                (0.0, np.pi),
+                (0.0, 2*np.pi),
+                (- np.pi / 2, np.pi / 2)]
+    else:
+        return None
       
 def get_ranges_GW190425_NRTidalv2(convert_chi, convert_lambdas):
     if convert_chi and convert_lambdas:
@@ -123,9 +148,10 @@ def get_ranges(event, convert_chi, convert_lambdas):
         return get_ranges_GW170817_TaylorF2(convert_chi, convert_lambdas)
     elif event == "GW190425_TaylorF2":
         return get_ranges_GW190425_TaylorF2(convert_chi, convert_lambdas)
+    elif event == "GW190425_TaylorF2_GWOSC":
+        return get_ranges_GW190425_TaylorF2_GWOSC(convert_chi, convert_lambdas)
     else:
         raise ValueError("Event not recognized in get_ranges!")
-    # TODO: implement the others as well here.
     
 ### IDX LIST ###
     
@@ -154,6 +180,14 @@ def get_idx_list_GW190425_TaylorF2(n_dim: int = 12):
         
     return idx_list
 
+def get_idx_list_GW190425_TaylorF2_GWOSC(n_dim: int = 12):
+    if n_dim == 11:
+        # idx_list = [1] * n_dim
+        idx_list = [1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1]
+        assert len(idx_list) == n_dim, "Length of idx_list does not match n_dim in get_idx_list!"
+        
+    return idx_list
+
 def get_idx_list_GW190425_NRTidalv2(n_dim: int = 12):
     if n_dim == 11:
         idx_list = [1] * n_dim
@@ -177,6 +211,9 @@ def get_idx_list(event, convert_chi, convert_lambdas):
     
     elif event == "GW190425_TaylorF2":
         return get_idx_list_GW190425_TaylorF2(n_dim)
+    
+    elif event == "GW190425_TaylorF2_GWOSC":
+        return get_idx_list_GW190425_TaylorF2_GWOSC(n_dim)
     
     else:
         raise ValueError("Event not recognized in get_idx_list!")
