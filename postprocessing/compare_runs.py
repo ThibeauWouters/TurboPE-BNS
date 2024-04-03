@@ -67,11 +67,12 @@ default_corner_kwargs = dict(bins=40,
 )
 
 my_gray = "#ababab"
-my_colors = {"jim": "blue", 
+my_blue = "#0f7db5"
+my_colors = {"jim": my_blue, 
              "bilby": my_gray}
 histogram_fill_color = "#d6d6d6"
 
-labels_chi_eff = [r'$M_c/M_\odot$', r'$q$', r'$\chi_{\rm eff}$', r'$\tilde{\Lambda}$', r'$\delta\tilde{\Lambda}$' ,r'$d_{\rm{L}}/{\rm Mpc}$',r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
+labels_chi_eff = [r'$\mathcal{M}/M_\odot$', r'$q$', r'$\chi_{\rm eff}$', r'$\tilde{\Lambda}$', r'$\delta\tilde{\Lambda}$' ,r'$d_{\rm{L}}/{\rm Mpc}$',r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
 
 
 #################
@@ -387,7 +388,8 @@ def main():
         "GW170817_NRTidalv2",
         "GW170817_TaylorF2",
         "GW190425_TaylorF2",
-        "GW190425_NRTidalv2"
+        "GW190425_NRTidalv2",
+        # "GW190425_TaylorF2_GWOSC"
 ]
     
     for event in events_to_plot:
