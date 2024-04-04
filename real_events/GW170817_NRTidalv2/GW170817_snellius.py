@@ -108,7 +108,6 @@ s1z_prior = Uniform(-0.05, 0.05, naming=["s1_z"])
 s2z_prior = Uniform(-0.05, 0.05, naming=["s2_z"])
 lambda_1_prior = Uniform(0.0, 5000.0, naming=["lambda_1"])
 lambda_2_prior = Uniform(0.0, 5000.0, naming=["lambda_2"])
-# dL_prior       = PowerLaw(1.0, 75.0, 2.0, naming=["d_L"])
 dL_prior       = Uniform(1.0, 75.0, naming=["d_L"])
 t_c_prior      = Uniform(-0.1, 0.1, naming=["t_c"])
 phase_c_prior  = Uniform(0.0, 2 * jnp.pi, naming=["phase_c"])
@@ -164,6 +163,7 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
 
+# to improve reproducibility, override the reference params after evosax has been run
 ref_params = {
     'M_c': 1.1975896,
     'eta': 0.2461001,
@@ -180,8 +180,21 @@ ref_params = {
     'dec': -0.34000186
 }
 
-n_bins = 1000
-likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
+n_bins = 1000 # NOTE 1000 gives good results, not sure about this
+n_loops = 1000
+
+outdir_name = "./outdir/"
+
+likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], 
+                                              prior=prior, 
+                                              bounds=bounds, 
+                                              waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), 
+                                              trigger_time=gps, 
+                                              duration=T, 
+                                              n_bins=n_bins, 
+                                              n_loops=n_loops,
+                                              ref_params=ref_params, 
+                                              outdir_name=outdir_name)
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
@@ -219,8 +232,6 @@ learning_rate = schedule_fn
 
 # Create jim object
 
-outdir_name = "./outdir/"
-
 jim = Jim(
     likelihood,
     prior,
@@ -241,7 +252,7 @@ jim = Jim(
     local_sampler_arg=local_sampler_arg,
     stopping_criterion_global_acc = 0.10,
     outdir_name=outdir_name
-) # n_loops_maximize_likelihood = 2000, ## unused
+)
 
 ### Heavy computation begins
 jim.sample(jax.random.PRNGKey(41))
@@ -325,4 +336,3 @@ print(f"Time taken: {runtime} seconds ({(runtime)/60} minutes)")
 print(f"Saving runtime")
 with open(outdir + 'runtime.txt', 'w') as file:
     file.write(str(runtime))
-    
