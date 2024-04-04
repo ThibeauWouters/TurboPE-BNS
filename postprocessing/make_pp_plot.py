@@ -14,7 +14,7 @@ from matplotlib.lines import Line2D
 from ripple import get_chi_eff, Mc_eta_to_ms
 from tqdm import tqdm
 
-fs = 32
+fs = 34
 matplotlib_params = {"axes.grid": True,
           "text.usetex" : True,
           "font.family" : "serif",
@@ -44,9 +44,9 @@ problematic_injections_dict = {"NRTv2": [],
 
 naming = ['M_c', 'q', 's1_z', 's2_z', 'lambda_1', 'lambda_2', 'd_L', 't_c', 'phase_c', 'cos_iota', 'psi', 'ra', 'sin_dec']
 naming_chi_eff = ['M_c', 'q', 'chi_eff', 'lambda_1', 'lambda_2', 'd_L', 't_c', 'phase_c', 'cos_iota', 'psi', 'ra', 'sin_dec']
-labels_original = [r'$M_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lambda_1$', r'$\Lambda_2$', r'$d_{\rm{L}}/{\rm Mpc}$',
+labels_original = [r'$\mathcal{M}/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lambda_1$', r'$\Lambda_2$', r'$d_{\rm{L}}/{\rm Mpc}$',
                r'$t_c$', r'$\phi_c$', r'$\cos\iota$', r'$\psi$', r'$\alpha$', r'$\sin\delta$']
-labels_chi_eff = [r'$M_c/M_\odot$', r'$q$', r'$\chi_{\rm eff}$', r'$\Lambda_1$', r'$\Lambda_2$', r'$d_{\rm{L}}/{\rm Mpc}$',
+labels_chi_eff = [r'$\mathcal{M}/M_\odot$', r'$q$', r'$\chi_{\rm eff}$', r'$\Lambda_1$', r'$\Lambda_2$', r'$d_{\rm{L}}/{\rm Mpc}$',
                r'$t_c$', r'$\phi_c$', r'$\cos\iota$', r'$\psi$', r'$\alpha$', r'$\sin\delta$']
 
 CB_color_cycle = ['#377eb8', '#ff7f00', '#4daf4a',
@@ -259,7 +259,9 @@ def make_uniform_cumulative_histogram(size: tuple, nb_bins: int = 100) -> np.arr
 def make_pp_plot(percentile_dict: dict, 
                  nb_bins: int = 500,
                  percentile_list: list = [0.68, 0.95, 0.995], 
-                 save_name: str = "pp_plot"
+                 save_name: str = "pp_plot",
+                 title: str  = "",
+                 remove_ylabel: bool = False
                  ) -> None:
     """
     Creates a pp plot from the credible levels.
@@ -385,9 +387,9 @@ def make_pp_plot(percentile_dict: dict,
     plt.gca().add_artist(leg1)
     plt.gca().add_artist(leg2)
 
-
     plt.xlabel(r'Credible level')
-    plt.ylabel(r'Fraction with credible level $\leq x$')
+    # plt.ylabel(r'Fraction with credible level $\leq x$')
+    plt.ylabel(r'Fraction of injections')
     print("Creating pp-plot, getting p values . . . DONE")
 
     print("pvalues")
@@ -396,15 +398,19 @@ def make_pp_plot(percentile_dict: dict,
     string_total = f"N = {len(credible_level_list)}, Total p-value: {ptotal:.2f}"
     print(string_total)
     
-    title_string = ""
-    print(title_string)
-    
     print("Saving pp-plot")
     plt.grid(False) # disable grida
-    plt.title(title_string)
-    xlim_eps = 1e-4
+    plt.title(title, fontsize = 34)
+    xlim_eps = 0.0
+    ylim_eps = 0.0001
     plt.xlim(xlim_eps, 1)
-    plt.ylim(xlim_eps, 1)
+    plt.ylim(ylim_eps, 1)
+    
+    if remove_ylabel:
+        ax = plt.gca()
+        ax.yaxis.label.set_color('white')
+        # ax.tick_params(axis='x', colors='black')
+        ax.tick_params(axis='y', which='both', labelcolor='white')
     
     for ext in [".png", ".pdf"]:
         full_savename = save_name + ext
@@ -422,7 +428,8 @@ def main():
     exclude_bad_injections = False
     
     wf_names = ["TF2", "NRTv2"]
-    for wf_name in wf_names:
+    titles = [r"\texttt{TaylorF2}", r"\texttt{IMRPhenomD\_NRTidalv2}"]
+    for idx, wf_name in enumerate(wf_names):
         print(f"Waveform: {wf_name}")
         
         if compute:
@@ -446,8 +453,15 @@ def main():
         result = choose_percentile_dict(result)
         
         print("Making pp plot . . .")
-        make_pp_plot(result, save_name=f"../figures/pp_plot_{wf_name}")
-    
+        if idx == 0:
+            remove_ylabel = False
+        else:
+            remove_ylabel = True
+        
+        make_pp_plot(result, 
+                     save_name=f"../figures/pp_plot_{wf_name}",
+                     title = titles[idx],
+                     remove_ylabel=remove_ylabel)
     
 if __name__ == "__main__":
     main()
