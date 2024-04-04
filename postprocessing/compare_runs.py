@@ -11,7 +11,6 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 
-
 import time
 import numpy as np
 import matplotlib.pyplot as plt 
