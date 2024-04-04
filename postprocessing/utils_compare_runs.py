@@ -52,7 +52,7 @@ jim_naming = ['M_c', 'q', 's1_z', 's2_z', 'lambda_1', 'lambda_2', 'd_L', 't_c', 
 gwosc_names = ['chirp_mass', 'mass_ratio', 'spin_1z', 'spin_2z', 'lambda_1', 'lambda_2', 'luminosity_distance', 't0', 'phase', 'iota', 'psi', 'ra', 'dec']
 bilby_names = ['chirp_mass', 'mass_ratio', 'spin_1z', 'spin_2z', 'lambda_1', 'lambda_2', 'luminosity_distance', 'phase', 'iota', 'psi', 'ra', 'dec']
 trigger_time_GW190425 = 1240215503.017147
-LABELS = [r'$\mathcal{M}_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lambda_1$', r'$\Lambda_2$', r'$d_{\rm{L}}/{\rm Mpc}$',
+LABELS = [r'$\mathcal{M}/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lambda_1$', r'$\Lambda_2$', r'$d_{\rm{L}}/{\rm Mpc}$',
                r'$t_c$', r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
 
 ### RANGES ###
@@ -157,32 +157,27 @@ def get_ranges(event, convert_chi, convert_lambdas):
     
 def get_idx_list_GW170817_TaylorF2(n_dim: int = 12):
     if n_dim == 11:
-        # idx_list = [1] * n_dim
-        idx_list = [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0]
+        idx_list = [1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0]
         assert len(idx_list) == n_dim, "Length of idx_list does not match n_dim in get_idx_list!"
         
     return idx_list
 
 def get_idx_list_GW170817_NRTidalv2(n_dim: int = 12):
     if n_dim == 11:
-        # idx_list = [1] * n_dim
         idx_list = [1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0] # 1 is jim
-        # idx_list = [0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1] # 0 is bilby
         assert len(idx_list) == n_dim, "Length of idx_list does not match n_dim in get_idx_list!"
         
     return idx_list
 
 def get_idx_list_GW190425_TaylorF2(n_dim: int = 12):
     if n_dim == 11:
-        # idx_list = [1] * n_dim
-        idx_list = [1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1]
+        idx_list = [1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1]
         assert len(idx_list) == n_dim, "Length of idx_list does not match n_dim in get_idx_list!"
         
     return idx_list
 
 def get_idx_list_GW190425_TaylorF2_GWOSC(n_dim: int = 12):
     if n_dim == 11:
-        # idx_list = [1] * n_dim
         idx_list = [1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1]
         assert len(idx_list) == n_dim, "Length of idx_list does not match n_dim in get_idx_list!"
         
