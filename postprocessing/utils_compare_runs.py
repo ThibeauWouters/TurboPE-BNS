@@ -26,26 +26,9 @@ paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/ou
                     },
               
               "GW190425_NRTidalv2": {"jim": jim_root_path + "GW190425_NRTidalv2/outdir/results_production.npz",
-                                     "bilby": bilby_root_path + "GW190425_IMRPhenomD_NRTidalv2_result.json",
+                                     "bilby": bilby_root_path + "GW190425_NRTv2_GWOSC_data_result.json",
                     },
 }
-
-### Old paths used for TF2 GW190425
-
-# "GW190425_TaylorF2": {"jim": jim_root_path + "GW190425_TaylorF2/outdir/results_production.npz",
-#                                     "bilby": bilby_root_path + "GW190425_TF2_with_tukey_fix_result.json",
-#                     },
-
-
-### Paths to compare Peter's result with the publicly available samples
-
-# "GW190425_TaylorF2_online_data": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_TaylorF2_redo/outdir/results_production.npz",
-#             "bilby": gwosc_path,
-#             },
-
-# "GW190425_NRTidalv2_online_data": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_NRTidalv2/outdir/results_production.npz",
-#             "bilby": gwosc_path,
-#             }
 
 jim_naming = ['M_c', 'q', 's1_z', 's2_z', 'lambda_1', 'lambda_2', 'd_L', 't_c', 'phase_c', 'cos_iota', 'psi', 'ra', 'sin_dec']
 

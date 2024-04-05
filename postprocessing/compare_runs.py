@@ -388,7 +388,6 @@ def main():
         "GW170817_TaylorF2",
         "GW190425_TaylorF2",
         "GW190425_NRTidalv2",
-        # "GW190425_TaylorF2_GWOSC"
 ]
     
     for event in events_to_plot:
