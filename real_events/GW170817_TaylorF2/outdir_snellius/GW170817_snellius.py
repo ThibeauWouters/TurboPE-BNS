@@ -49,7 +49,7 @@ labels = [r'$M_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lambda$', r'$\
                r'$t_c$', r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
 naming = ['M_c', 'q', 's1_z', 's2_z', 'lambda_1', 'lambda_2', 'd_L', 't_c', 'phase_c', 'cos_iota', 'psi', 'ra', 'sin_dec']
 
-data_path = "/home/twouters2/gw-datasets/GW190425/" # on CIT
+data_path = "/home/twouters2/gw-datasets/GW170817/" # on snellius
 
 start_runtime = time.time()
 
@@ -60,9 +60,9 @@ start_runtime = time.time()
 ### Data definitions
 
 total_time_start = time.time()
-gps = 1240215503.017147
+gps = 1187008882.43
 trigger_time = gps
-fmin = 20
+fmin = 23
 fmax = 2048
 minimum_frequency = fmin
 maximum_frequency = fmax
@@ -70,32 +70,16 @@ T = 128
 duration = T
 post_trigger_duration = 2
 epoch = duration - post_trigger_duration
-f_ref = fmin
+f_ref = fmin 
 tukey_alpha = 2 / (T / 2)
 
 ### Getting detector data
 
-# # Load the data
-# L1.load_data(trigger_time=trigger_time,
-#              gps_start_pad=duration-2,
-#              gps_end_pad=2,
-#              f_min=fmin,
-#              f_max=fmax,
-#              tukey_alpha = tukey_alpha,
-#              load_psd = False)
+# This is our preprocessed data obtained from the TXT files at the GWOSC website (the GWF gave me NaNs?)
+H1.frequencies = np.genfromtxt(f'{data_path}H1_freq.txt')
+H1_data_re, H1_data_im = np.genfromtxt(f'{data_path}H1_data_re.txt'), np.genfromtxt(f'{data_path}H1_data_im.txt')
+H1.data = H1_data_re + 1j * H1_data_im
 
-# V1.load_data(trigger_time=trigger_time,
-#              gps_start_pad=duration-2,
-#              gps_end_pad=2,
-#              f_min=fmin,
-#              f_max=fmax,
-#              tukey_alpha = tukey_alpha,
-#              load_psd = False)
-
-# L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
-# V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
-
-### This is our preprocessed data obtained from the TXT files at the GWOSC website (the GWF gave me NaNs?)
 L1.frequencies = np.genfromtxt(f'{data_path}L1_freq.txt')
 L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}L1_data_re.txt'), np.genfromtxt(f'{data_path}L1_data_im.txt')
 L1.data = L1_data_re + 1j * L1_data_im
@@ -106,12 +90,14 @@ V1.data = V1_data_re + 1j * V1_data_im
 
 # Load the PSD
 
-L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
-V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
+H1.psd = H1.load_psd(H1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_H1_psd.txt")
+L1.psd = L1.load_psd(L1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_L1_psd.txt")
+V1.psd = V1.load_psd(V1.frequencies, psd_file = data_path + "GW170817-IMRD_data0_1187008882-43_generation_data_dump.pickle_V1_psd.txt")
 
+### Define priors
 
 # Internal parameters
-Mc_prior = Uniform(1.485, 1.490, naming=["M_c"])
+Mc_prior = Uniform(1.18, 1.21, naming=["M_c"])
 q_prior = Uniform(
     0.125,
     1.0,
@@ -122,7 +108,8 @@ s1z_prior = Uniform(-0.05, 0.05, naming=["s1_z"])
 s2z_prior = Uniform(-0.05, 0.05, naming=["s2_z"])
 lambda_1_prior = Uniform(0.0, 5000.0, naming=["lambda_1"])
 lambda_2_prior = Uniform(0.0, 5000.0, naming=["lambda_2"])
-dL_prior       = Uniform(1.0, 500.0, naming=["d_L"])
+dL_prior       = Uniform(1.0, 75.0, naming=["d_L"])
+# dL_prior       = PowerLaw(1.0, 75.0, 2.0, naming=["d_L"])
 t_c_prior      = Uniform(-0.1, 0.1, naming=["t_c"])
 phase_c_prior  = Uniform(0.0, 2 * jnp.pi, naming=["phase_c"])
 cos_iota_prior = Uniform(
@@ -177,30 +164,31 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
 
-n_bins = 200
-# for reproducibility, fix reference parameters
+# for reproducibility, still override
 ref_params = {
-    'M_c': 1.486722,
-    'eta': 0.18946014,
-    's1_z': 0.04419246,
-    's2_z': 0.00038679,
-    'lambda_1': 455.74266717,
-    'lambda_2': 144.29782064,
-    'd_L': 131.97211914,
-    't_c': -0.01579126,
-    'phase_c': 1.98962121,
-    'iota': 1.11046195,
-    'psi': 2.02977615,
-    'ra': 1.26495061,
-    'dec': -0.42639091
+    'M_c': 1.19793583,
+    'eta': 0.24794374,
+    's1_z': 0.00220637,
+    's2_z': 0.05,
+    'lambda_1': 105.12916663,
+    'lambda_2': 0.0,
+    'd_L': 45.41592353,
+    't_c': 0.00220588,
+    'phase_c': 5.76822606,
+    'iota': 2.46158044,
+    'psi': 2.09118099,
+    'ra': 5.03335133,
+    'dec': 0.01679998
 }
 
-likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleTaylorF2(), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
+n_bins = 100
+
+likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleTaylorF2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
 
-eps = 1e-2
+eps = 1e-3
 n_dim = 13
 mass_matrix = jnp.eye(n_dim)
 mass_matrix = mass_matrix.at[0,0].set(1e-5)
@@ -215,11 +203,11 @@ local_sampler_arg = {"step_size": mass_matrix * eps}
 # Build the learning rate scheduler
 
 n_loop_training = 400
-n_epochs = 100
+n_epochs = 50
 total_epochs = n_epochs * n_loop_training
 start = int(total_epochs / 10)
 start_lr = 1e-3
-end_lr = 1e-4
+end_lr = 1e-5
 power = 4.0
 schedule_fn = optax.polynomial_schedule(
     start_lr, end_lr, power, total_epochs-start, transition_begin=start)
@@ -227,16 +215,39 @@ schedule_fn = optax.polynomial_schedule(
 scheduler_str = f"polynomial_schedule({start_lr}, {end_lr}, {power}, {total_epochs-start}, {start})"
 
 # Create jim object
+
 outdir_name = "./outdir/"
+# jim = Jim(
+#     likelihood,
+#     prior,
+#     n_loop_training=n_loop_training,
+#     n_loop_production=30,
+#     n_local_steps=5,
+#     n_global_steps=400,
+#     n_chains=1000,
+#     n_epochs=n_epochs,
+#     learning_rate=schedule_fn,
+#     max_samples=50000,
+#     momentum=0.9,
+#     batch_size=50000,
+#     use_global=True,
+#     keep_quantile=0.0,
+#     train_thinning=10,
+#     output_thinning=30,    
+#     local_sampler_arg=local_sampler_arg,
+#     stopping_criterion_global_acc = 0.15,
+#     outdir_name=outdir_name
+# )
+
 jim = Jim(
     likelihood,
     prior,
-    n_loop_training=n_loop_training,
-    n_loop_production=40,
-    n_local_steps=5,
-    n_global_steps=400,
+    n_loop_training=400,
+    n_loop_production=20,
+    n_local_steps=10,
+    n_global_steps=300,
     n_chains=1000,
-    n_epochs=n_epochs,
+    n_epochs=100,
     learning_rate=schedule_fn,
     max_samples=50000,
     momentum=0.9,
@@ -246,35 +257,12 @@ jim = Jim(
     train_thinning=10,
     output_thinning=30,    
     local_sampler_arg=local_sampler_arg,
-    stopping_criterion_global_acc = 0.10,
+    stopping_criterion_global_acc = 0.20,
     outdir_name=outdir_name
-)
-
-
-# ### These were the old (december) hyperparams
-# jim = Jim(
-#     likelihood,
-#     prior,
-#     n_loop_training=200,
-#     n_loop_production=200,
-#     n_local_steps=500,
-#     n_global_steps=500,
-#     n_chains=2000,
-#     n_epochs=100,
-#     learning_rate=0.001,
-#     max_samples=50000,
-#     momentum=0.9,
-#     batch_size=50000,
-#     use_global=True,
-#     keep_quantile=0.0,
-#     train_thinning=20,
-#     output_thinning=50,    
-#     local_sampler_arg=local_sampler_arg,
-#     outdir_name=outdir_name
-# )
+) # n_loops_maximize_likelihood = 2000, ## unused
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(82))
+jim.sample(jax.random.PRNGKey(41))
 ### Heavy computation ends
 
 # === Show results, save output ===
