@@ -180,9 +180,7 @@ ref_params = {
     'dec': -0.34000186
 }
 
-n_bins = 1000 # NOTE 1000 gives good results, not sure about this
-n_loops = 1000
-
+n_bins = 1000 # NOTE 1000 gives good results, not sure if we can push it down to lower nb bins, this gives bad results (RB breakdown)
 outdir_name = "./outdir/"
 
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], 
@@ -192,7 +190,6 @@ likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1],
                                               trigger_time=gps, 
                                               duration=T, 
                                               n_bins=n_bins, 
-                                              n_loops=n_loops,
                                               ref_params=ref_params, 
                                               outdir_name=outdir_name)
 print("Running with n_bins  = ", n_bins)

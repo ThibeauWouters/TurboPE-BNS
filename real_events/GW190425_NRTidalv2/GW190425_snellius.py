@@ -2,7 +2,7 @@ import os
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
 from jimgw.single_event.likelihood import HeterodynedTransientLikelihoodFD
-from jimgw.single_event.waveform import RippleTaylorF2
+from jimgw.single_event.waveform import RippleIMRPhenomD_NRTidalv2
 from jimgw.prior import Uniform, PowerLaw, Composite 
 import jax.numpy as jnp
 import jax
@@ -72,28 +72,9 @@ post_trigger_duration = 2
 epoch = duration - post_trigger_duration
 f_ref = fmin
 tukey_alpha = 2 / (T / 2)
+print(tukey_alpha)
 
 ### Getting detector data
-
-# # Load the data
-# L1.load_data(trigger_time=trigger_time,
-#              gps_start_pad=duration-2,
-#              gps_end_pad=2,
-#              f_min=fmin,
-#              f_max=fmax,
-#              tukey_alpha = tukey_alpha,
-#              load_psd = False)
-
-# V1.load_data(trigger_time=trigger_time,
-#              gps_start_pad=duration-2,
-#              gps_end_pad=2,
-#              f_min=fmin,
-#              f_max=fmax,
-#              tukey_alpha = tukey_alpha,
-#              load_psd = False)
-
-# L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
-# V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
 ### This is our preprocessed data obtained from the TXT files at the GWOSC website (the GWF gave me NaNs?)
 L1.frequencies = np.genfromtxt(f'{data_path}L1_freq.txt')
@@ -104,11 +85,10 @@ V1.frequencies = np.genfromtxt(f'{data_path}V1_freq.txt')
 V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}V1_data_re.txt'), np.genfromtxt(f'{data_path}V1_data_im.txt')
 V1.data = V1_data_re + 1j * V1_data_im
 
-# Load the PSD
-
 L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
 V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
+### Define priors
 
 # Internal parameters
 Mc_prior = Uniform(1.485, 1.490, naming=["M_c"])
@@ -176,26 +156,27 @@ prior = Composite(prior_list)
 bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
-
 n_bins = 200
-# for reproducibility, fix reference parameters
+
+# for reproducibility, fix the reference parameters
 ref_params = {
-    'M_c': 1.486722,
-    'eta': 0.18946014,
-    's1_z': 0.04419246,
-    's2_z': 0.00038679,
-    'lambda_1': 455.74266717,
-    'lambda_2': 144.29782064,
-    'd_L': 131.97211914,
-    't_c': -0.01579126,
-    'phase_c': 1.98962121,
-    'iota': 1.11046195,
-    'psi': 2.02977615,
-    'ra': 1.26495061,
-    'dec': -0.42639091
+    'M_c': 1.48691818,
+    'eta': 0.241871,
+    's1_z': 0.04999867,
+    's2_z': 0.00045155,
+    'lambda_1': 124.89143138,
+    'lambda_2': 505.92929128,
+    'd_L': 62.20843724,
+    't_c': 0.04139502,
+    'phase_c': 5.10878036,
+    'iota': 1.2916141,
+    'psi': 0.24112725,
+    'ra': 4.03454026,
+    'dec': 0.52655272
 }
 
-likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleTaylorF2(), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
+
+likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
@@ -219,7 +200,7 @@ n_epochs = 100
 total_epochs = n_epochs * n_loop_training
 start = int(total_epochs / 10)
 start_lr = 1e-3
-end_lr = 1e-4
+end_lr = 1e-5
 power = 4.0
 schedule_fn = optax.polynomial_schedule(
     start_lr, end_lr, power, total_epochs-start, transition_begin=start)
@@ -227,6 +208,7 @@ schedule_fn = optax.polynomial_schedule(
 scheduler_str = f"polynomial_schedule({start_lr}, {end_lr}, {power}, {total_epochs-start}, {start})"
 
 # Create jim object
+
 outdir_name = "./outdir/"
 jim = Jim(
     likelihood,
@@ -250,31 +232,8 @@ jim = Jim(
     outdir_name=outdir_name
 )
 
-
-# ### These were the old (december) hyperparams
-# jim = Jim(
-#     likelihood,
-#     prior,
-#     n_loop_training=200,
-#     n_loop_production=200,
-#     n_local_steps=500,
-#     n_global_steps=500,
-#     n_chains=2000,
-#     n_epochs=100,
-#     learning_rate=0.001,
-#     max_samples=50000,
-#     momentum=0.9,
-#     batch_size=50000,
-#     use_global=True,
-#     keep_quantile=0.0,
-#     train_thinning=20,
-#     output_thinning=50,    
-#     local_sampler_arg=local_sampler_arg,
-#     outdir_name=outdir_name
-# )
-
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(82))
+jim.sample(jax.random.PRNGKey(37))
 ### Heavy computation ends
 
 # === Show results, save output ===
