@@ -114,7 +114,6 @@ V1.data = V1_data_re + 1j * V1_data_im
 L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
 V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
-
 # Internal parameters
 Mc_prior = Uniform(1.485, 1.490, naming=["M_c"])
 q_prior = Uniform(
@@ -255,28 +254,6 @@ jim = Jim(
     outdir_name=outdir_name
 )
 
-
-# ### These were the old (december) hyperparams
-# jim = Jim(
-#     likelihood,
-#     prior,
-#     n_loop_training=200,
-#     n_loop_production=200,
-#     n_local_steps=500,
-#     n_global_steps=500,
-#     n_chains=2000,
-#     n_epochs=100,
-#     learning_rate=0.001,
-#     max_samples=50000,
-#     momentum=0.9,
-#     batch_size=50000,
-#     use_global=True,
-#     keep_quantile=0.0,
-#     train_thinning=20,
-#     output_thinning=50,    
-#     local_sampler_arg=local_sampler_arg,
-#     outdir_name=outdir_name
-# )
 
 ### Heavy computation begins
 jim.sample(jax.random.PRNGKey(82))

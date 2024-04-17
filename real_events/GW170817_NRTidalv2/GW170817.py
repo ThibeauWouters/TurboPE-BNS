@@ -2,7 +2,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.15"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
@@ -168,6 +168,7 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
 
+# to improve reproducibility, override the reference params after evosax has been run
 ref_params = {
     'M_c': 1.1975896,
     'eta': 0.2461001,
@@ -184,10 +185,21 @@ ref_params = {
     'dec': -0.34000186
 }
 
-ref_params = None
-n_bins = 100 # NOTE 1000 gives good results
+n_bins = 1000 # NOTE 1000 gives good results, not sure about this
+n_loops = 1000
 
-likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
+outdir_name = "./outdir/"
+
+likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], 
+                                              prior=prior, 
+                                              bounds=bounds, 
+                                              waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), 
+                                              trigger_time=gps, 
+                                              duration=T, 
+                                              n_bins=n_bins, 
+                                              n_loops=n_loops,
+                                              ref_params=ref_params, 
+                                              outdir_name=outdir_name)
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
@@ -225,8 +237,6 @@ learning_rate = schedule_fn
 
 # Create jim object
 
-outdir_name = "./outdir/"
-
 jim = Jim(
     likelihood,
     prior,
@@ -250,7 +260,7 @@ jim = Jim(
 )
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(0))
+jim.sample(jax.random.PRNGKey(41))
 ### Heavy computation ends
 
 # === Show results, save output ===
