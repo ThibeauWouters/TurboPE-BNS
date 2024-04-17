@@ -1,3 +1,5 @@
+NOTE: This repository will be updated with details on how to get the correct versions of ripple, flowMC and jim to rerun all runs posted here.
+
 # TurboPE-BNS
 
 Repository for the paper for fast parameter estimation of BNS GW signals.
