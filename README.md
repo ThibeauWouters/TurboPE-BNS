@@ -2,7 +2,35 @@
 
 # TurboPE-BNS
 
-Repository with scripts used for the paper [Robust parameter estimation within minutes on gravitational wave signals from binary neutron star inspirals](https://arxiv.org/abs/2404.11397). Please raise an issue on this Github repository if you encounter any issue.
+Repository with scripts used for the paper [Robust parameter estimation within minutes on gravitational wave signals from binary neutron star inspirals](https://arxiv.org/abs/2404.11397). Please raise an issue on this Github repository if you encounter any issue. If you make use of the methods presented in this work, please cite:
+```bibtex
+@misc{wouters2024robust,
+      title={Robust parameter estimation within minutes on gravitational wave signals from binary neutron star inspirals}, 
+      author={Thibeau Wouters and Peter T. H. Pang and Tim Dietrich and Chris Van Den Broeck},
+      year={2024},
+      eprint={2404.11397},
+      archivePrefix={arXiv},
+      primaryClass={astro-ph.IM}
+}
+```
+
+Also make sure to cite the original `Jim` paper:
+
+```bibtex
+@article{Wong:2023lgb,
+    author = "Wong, Kaze W. K. and Isi, Maximiliano and Edwards, Thomas D. P.",
+    title = "{Fast Gravitational-wave Parameter Estimation without Compromises}",
+    eprint = "2302.05333",
+    archivePrefix = "arXiv",
+    primaryClass = "astro-ph.IM",
+    doi = "10.3847/1538-4357/acf5cd",
+    journal = "Astrophys. J.",
+    volume = "958",
+    number = "2",
+    pages = "129",
+    year = "2023"
+}
+```
 
 ## Reproducibility
 
