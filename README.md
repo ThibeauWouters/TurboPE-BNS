@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10991918.svg)](https://doi.org/10.5281/zenodo.10991918)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10991918.svg)](https://zenodo.org/records/10991918)
 
 # TurboPE-BNS
 
