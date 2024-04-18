@@ -1,4 +1,4 @@
-NOTE: This repository will be updated with details on how to get the correct versions of ripple, flowMC and jim to rerun all runs posted here.
+NOTE: More information will be shared on how to reproduce the results soon.
 
 # TurboPE-BNS
 
