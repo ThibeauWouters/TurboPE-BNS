@@ -455,27 +455,6 @@ def body(args):
         ref_params = None
         print("Will search for reference waveform for relative binning")
     
-    ### TODO remove
-    # Explicitly fix relative binning for NRTidalv2
-    if args.waveform_approximant in ["IMRPhenomD_NRTidalv2", "NRTidalv2"]:
-        # ## TODO this might be broken?
-        # # # Explicitly set the f_min and f_max used there
-        # # relbin_kwargs = {"f_min": config["fmin"], "f_max": config["f_sampling"] / 2}
-        # relbin_kwargs = {}
-        
-        # # Set the reference parameters at the ideal location for not breaking relative binning 
-        # print("Setting the reference parameters to not break the relative binning for NRTidalv2")
-        # ref_params = true_param 
-        # ref_params["lambda_1"] = 1.0
-        # ref_params["lambda_2"] = 1.0
-        
-        print("Now, the reference parameters are: ")
-        print(ref_params)
-    else:
-        relbin_kwargs = {}
-        
-    relbin_kwargs = {}
-        
     likelihood = HeterodynedTransientLikelihoodFD(
         ifos,
         prior=complete_prior,
@@ -486,7 +465,6 @@ def body(args):
         duration=config["duration"],
         post_trigger_duration=config["post_trigger_duration"],
         ref_params=ref_params,
-        **relbin_kwargs
         )
     
     if args.save_likelihood:
