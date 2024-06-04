@@ -35,8 +35,9 @@ plt.rcParams.update(matplotlib_params)
 ### PREAMBLE ###
 ################
 
-outdirs_dict = {"TF2": '/home/thibeau.wouters/TurboPE-BNS/injections/outdir_TF2/',
-                "NRTv2": '/home/thibeau.wouters/TurboPE-BNS/injections/outdir_NRTv2/'}
+outdirs_dict = {"TF2": '/home/thibeau.wouters/bonz/bonz_marlinde/injections/campaign/outdir/',
+                }
+# "NRTv2": '/home/thibeau.wouters/TurboPE-BNS/injections/outdir_NRTv2/'
 
 # all injections are OK now
 problematic_injections_dict = {"NRTv2": [],
@@ -136,7 +137,8 @@ def get_credible_levels(wf_name: str,
                         apply_postprocess: bool = True,
                         convert_chi_eff: bool = True,
                         exclude_bad_injections: bool = True,
-                        save: bool = True):
+                        save: bool = True,
+                        save_name: str = "credible_levels_dict.pkl"):
     
     # Fetch correct outdir
     outdir = outdirs_dict[wf_name]
@@ -194,7 +196,7 @@ def get_credible_levels(wf_name: str,
         
     if save:
         # Save with pickle
-        with open(f"./percentiles/credible_levels_dict_{wf_name}.pkl", "wb") as f:
+        with open(save_name, "wb") as f:
             pickle.dump(credible_levels_dict, f)
         
     return credible_levels_dict
@@ -423,12 +425,13 @@ def make_pp_plot(percentile_dict: dict,
 
 def main():
     
-    compute = False
+    compute = True
     convert_chi_eff = True
     exclude_bad_injections = False
     
-    wf_names = ["TF2", "NRTv2"]
-    titles = [r"\texttt{TaylorF2}", r"\texttt{IMRPhenomD\_NRTidalv2}"]
+    wf_names = ["TF2"]
+    titles = [r"\texttt{TaylorF2}"]
+    credible_list_save_name = f"/home/thibeau.wouters/bonz/bonz_marlinde/injections/campaign/outdir/credible_levels_dict.pkl"
     for idx, wf_name in enumerate(wf_names):
         print(f"Waveform: {wf_name}")
         
@@ -436,10 +439,11 @@ def main():
             # Re-compute the p values for the injections
             result = get_credible_levels(wf_name, 
                                          convert_chi_eff=convert_chi_eff, 
+                                         save_name=credible_list_save_name,
                                          exclude_bad_injections=exclude_bad_injections)
         else:
             # Load with pickle
-            with open(f"./percentiles/credible_levels_dict_{wf_name}.pkl", "rb") as f:
+            with open(credible_list_save_name, "rb") as f:
                 result = pickle.load(f)
                 
         # Compute p values:
@@ -459,7 +463,7 @@ def main():
             remove_ylabel = True
         
         make_pp_plot(result, 
-                     save_name=f"../figures/pp_plot_{wf_name}",
+                     save_name=f"/home/thibeau.wouters/bonz/bonz_marlinde/injections/campaign/outdir/pp_plot",
                      title = titles[idx],
                      remove_ylabel=remove_ylabel)
     
