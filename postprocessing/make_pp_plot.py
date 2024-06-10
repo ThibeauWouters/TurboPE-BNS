@@ -14,6 +14,8 @@ from matplotlib.lines import Line2D
 from ripple import get_chi_eff, Mc_eta_to_ms
 from tqdm import tqdm
 
+from scipy.stats import combine_pvalues
+
 fs = 34
 matplotlib_params = {"axes.grid": True,
           "text.usetex" : True,
@@ -394,7 +396,8 @@ def make_pp_plot(percentile_dict: dict,
 
     print("pvalues")
     print(pvalues)
-    ptotal = kstest(pvalues, cdf=uniform(0,1).cdf).pvalue
+    # ptotal = kstest(pvalues, cdf=uniform(0,1).cdf).pvalue
+    ptotal = combine_pvalues(pvalues, 'fisher').pvalue
     string_total = f"N = {len(credible_level_list)}, Total p-value: {ptotal:.2f}"
     print(string_total)
     
