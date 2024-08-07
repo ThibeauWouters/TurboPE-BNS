@@ -1,0 +1,65 @@
+d=0)]
+0.03125
+Fetching data from L1...
+Fetching data from V1...
+Initializing heterodyned likelihood..
+Finding reference parameters..
+Using provided reference parameters:
+ref_params
+{'M_c': 1.48673471, 'eta': 0.24964816, 's1_z': -0.03212059, 's2_z': 0.04940074, 'lambda_1': 170.66131572, 'lambda_2': 392.72069516, 'd_L': 90.496605, 't_c': 0.02454119, 'phase_c': 6.
+27789316, 'iota': 1.15036904, 'psi': 1.9846727, 'ra': 4.08402371, 'dec': 0.51115334}
+Constructing reference waveforms..
+Running with n_bins  =  200
+INFO: Using MALA as local sampler
+No autotune found, use input sampler_params
+Training normalizing flow
+Tuning global sampler:   0%|                                                                                                                                  | 0/400 [00:00<?, ?it/s]
+Compiling MALA body
+Tuning global sampler:  21%|█████████████████████████▋                                                                                               | 85/400 [16:16<51:39,  9.84s/it]
+Early stopping: global acceptance target rate achieved
+Tuning global sampler:  21%|█████████████████████████▎                                                                                             | 85/400 [16:26<1:00:54, 11.60s/it$
+Starting Production run
+Production run: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 40/40 [00:38<00:00,  1.03it/s$
+Training summary
+==========
+M_c: 1.487 +/- 0.000
+eta: 0.247 +/- 0.005
+s1_z: 0.022 +/- 0.020
+s2_z: 0.017 +/- 0.022
+lambda_1: 856.636 +/- 915.681
+lambda_2: 1195.213 +/- 1116.689
+d_L: 145.045 +/- 55.611
+t_c: 0.003 +/- 0.018
+phase_c: 3.171 +/- 1.786
+iota: 1.428 +/- 0.763
+psi: 1.570 +/- 0.892
+ra: 2.502 +/- 1.590
+dec: -0.052 +/- 0.579
+Log probability: 53.563 +/- 276.949
+Local acceptance: 0.990 +/- 0.098
+Global acceptance: 0.034 +/- 0.182
+Max loss: 22.781, Min loss: 4.964
+Production summary
+==========
+M_c: 1.487 +/- 0.000
+eta: 0.248 +/- 0.003
+s1_z: 0.022 +/- 0.020
+s2_z: 0.017 +/- 0.022
+lambda_1: 593.013 +/- 647.703
+lambda_2: 903.255 +/- 913.690
+d_L: 132.201 +/- 44.280
+t_c: 0.001 +/- 0.017
+phase_c: 3.199 +/- 1.807
+iota: 1.468 +/- 0.786
+psi: 1.572 +/- 0.908
+ra: 2.390 +/- 1.611
+dec: -0.147 +/- 0.588
+Log probability: 58.957 +/- 2.662
+Local acceptance: 0.986 +/- 0.118
+Global acceptance: 0.098 +/- 0.297
+Saving samples to ./outdir/results_training.npz
+Saving the NF
+Saving the jim hyperparameters
+Finished successfully
+Time taken: 1169.582513809204 seconds (19.493041896820067 minutes)
+Saving runtime
