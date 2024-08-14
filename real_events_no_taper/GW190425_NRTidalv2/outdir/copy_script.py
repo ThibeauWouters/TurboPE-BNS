@@ -23,7 +23,7 @@ sys.path.append("../")
 import utils_plotting as utils
 print(jax.devices())
 
-################
+
 ### PREAMBLE ###
 ################
 
@@ -191,6 +191,7 @@ likelihood = HeterodynedTransientLikelihoodFD([L1, V1],
                                               n_bins=n_bins, 
                                               n_loops = n_loops,
                                               outdir_name=outdir_name,
+                                              ref_params=ref_params,
                                               reference_waveform = RippleIMRPhenomD_NRTidalv2_no_taper(f_ref=f_ref)) # NEW!!!
 print("Running with n_bins  = ", n_bins)
 

@@ -471,7 +471,7 @@ def compare_taper_runs():
     taper_path = "/home/thibeau.wouters/TurboPE-BNS/real_events/"
     no_taper_path = "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/"
     
-    for run_name in ["GW170817_NRTidalv2", "GW190425_NRTidalv2"]:
+    for run_name in ["GW190425_NRTidalv2"]: # "GW170817_NRTidalv2",
     
         taper_filename = os.path.join(taper_path, f"{run_name}/outdir/results_production.npz")
         no_taper_filename = os.path.join(no_taper_path, f"{run_name}/outdir/results_production.npz")
@@ -527,8 +527,8 @@ def compare_taper_runs():
         print("DONE")
     
 def main():
-    compare_jim_pbilby()
-    # compare_taper_runs()
+    # compare_jim_pbilby()
+    compare_taper_runs()
     
     # compute_js_divergences()
         
