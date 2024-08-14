@@ -3,11 +3,11 @@ p = psutil.Process()
 p.cpu_affinity([0])
 import os 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
+os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.15"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
 from jimgw.single_event.likelihood import HeterodynedTransientLikelihoodFD
-from jimgw.single_event.waveform import RippleIMRPhenomD_NRTidalv2
+from jimgw.single_event.waveform import RippleIMRPhenomD_NRTidalv2, RippleIMRPhenomD_NRTidalv2_no_taper
 from jimgw.prior import Uniform, PowerLaw, Composite 
 import jax.numpy as jnp
 import jax
@@ -181,7 +181,15 @@ ref_params = {
 }
 
 
-likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
+likelihood = HeterodynedTransientLikelihoodFD([L1, V1], 
+                                              prior=prior, 
+                                              bounds=bounds, 
+                                              waveform=RippleIMRPhenomD_NRTidalv2(), 
+                                              trigger_time=gps, 
+                                              duration=T, 
+                                              n_bins=n_bins, 
+                                              ref_params=ref_params, 
+                                              reference_waveform = RippleIMRPhenomD_NRTidalv2_no_taper(f_ref=f_ref))
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
