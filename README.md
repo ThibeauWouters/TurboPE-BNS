@@ -4,13 +4,14 @@
 
 Repository with scripts used for the paper [Robust parameter estimation within minutes on gravitational wave signals from binary neutron star inspirals](https://arxiv.org/abs/2404.11397). Please raise an issue on this Github repository if you encounter any issue. If you make use of the methods presented in this work, please cite:
 ```bibtex
-@misc{wouters2024robust,
-      title={Robust parameter estimation within minutes on gravitational wave signals from binary neutron star inspirals}, 
-      author={Thibeau Wouters and Peter T. H. Pang and Tim Dietrich and Chris Van Den Broeck},
-      year={2024},
-      eprint={2404.11397},
-      archivePrefix={arXiv},
-      primaryClass={astro-ph.IM}
+@article{Wouters:2024oxj,
+    author = "Wouters, Thibeau and Pang, Peter T. H. and Dietrich, Tim and Van Den Broeck, Chris",
+    title = "{Robust parameter estimation within minutes on gravitational wave signals from binary neutron star inspirals}",
+    eprint = "2404.11397",
+    archivePrefix = "arXiv",
+    primaryClass = "astro-ph.IM",
+    month = "4",
+    year = "2024"
 }
 ```
 
