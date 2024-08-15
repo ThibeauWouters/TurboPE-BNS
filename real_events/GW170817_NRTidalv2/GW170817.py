@@ -169,24 +169,23 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 ### Create likelihood object
 
 # to improve reproducibility, override the reference params after evosax has been run
-# ref_params = {
-#     'M_c': 1.1975896,
-#     'eta': 0.2461001,
-#     's1_z': -0.01890608,
-#     's2_z': 0.04888488,
-#     'lambda_1': 791.04366468,
-#     'lambda_2': 891.04366468,
-#     'd_L': 40.06331818,
-#     't_c': 0.00193536,
-#     'phase_c': 5.88649652,
-#     'iota': 1.93095421,
-#     'psi': 1.59687217,
-#     'ra': 3.39736826,
-#     'dec': -0.34000186
-# }
+ref_params = {
+    'M_c': 1.1975896,
+    'eta': 0.2461001,
+    's1_z': -0.01890608,
+    's2_z': 0.04888488,
+    'lambda_1': 791.04366468,
+    'lambda_2': 891.04366468,
+    'd_L': 40.06331818,
+    't_c': 0.00193536,
+    'phase_c': 5.88649652,
+    'iota': 1.93095421,
+    'psi': 1.59687217,
+    'ra': 3.39736826,
+    'dec': -0.34000186
+}
 
 n_bins = 1000 # NOTE 1000 gives good results, not sure about this
-# n_loops = 1000
 
 outdir_name = "./outdir/"
 
@@ -197,10 +196,9 @@ likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1],
                                               trigger_time=gps, 
                                               duration=T, 
                                               n_bins=n_bins, 
-                                            #   n_loops=n_loops,
                                               ref_params=ref_params, 
                                               outdir_name=outdir_name,
-                                              reference_waveform = RippleIMRPhenomD_NRTidalv2_no_taper(f_ref=f_ref)) # NEW!!!)
+                                              )
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args

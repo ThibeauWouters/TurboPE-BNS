@@ -3,7 +3,7 @@ p = psutil.Process()
 p.cpu_affinity([0])
 import os 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.125"
+os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.15"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
 from jimgw.single_event.likelihood import HeterodynedTransientLikelihoodFD
@@ -186,9 +186,10 @@ ref_params = {
 }
 
 n_bins = 1000 # NOTE 1000 gives good results, not sure about this
-n_loops = 1000
 
 outdir_name = "./outdir/"
+if not os.path.exists(outdir_name):
+    os.makedirs(outdir_name)
 
 likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], 
                                               prior=prior, 
@@ -197,7 +198,6 @@ likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1],
                                               trigger_time=gps, 
                                               duration=T, 
                                               n_bins=n_bins, 
-                                              n_loops=n_loops,
                                               ref_params=ref_params, 
                                               outdir_name=outdir_name,
                                               reference_waveform = RippleIMRPhenomD_NRTidalv2_no_taper(f_ref=f_ref)) # NEW!!!

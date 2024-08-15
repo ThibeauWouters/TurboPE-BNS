@@ -476,61 +476,66 @@ def compare_taper_runs():
     for run_name in ["GW170817_NRTidalv2", "GW190425_NRTidalv2"]:
     
         taper_filename = os.path.join(taper_path, f"{run_name}/outdir/results_production.npz")
-        no_taper_filename = os.path.join(no_taper_path, f"{run_name}/outdir/results_production.npz")
+        # For GW170817: load from the different, new runs
+        if run_name == "GW170817_NRTidalv2":
+            for suffix in ["", "_noise_25215", "_noise_447462", "_noise_842007", "_noise_990322", "_noise_986872"]:
+                no_taper_filename = os.path.join(no_taper_path, f"{run_name}/outdir{suffix}/results_production.npz")
         
-        taper_samples = utils_compare_runs.get_chains_jim(taper_filename)
-        no_taper_samples = utils_compare_runs.get_chains_jim(no_taper_filename)
+                print(f"Making plots for no_taper_filename: {no_taper_filename}")
         
-        convert_chi = True
-        convert_lambdas = True
-        
-        # TODO: typo here? Breaks the code
-        # n_dim = 13
-        # if convert_chi:
-        #     n_dim -= 1
-        # if convert_lambdas:
-        #     n_dim -= 1
-        
-        idx_list = [0] * 11
-        
-        # range = utils_compare_runs.get_ranges(run_name, convert_chi=convert_chi, convert_lambdas=convert_lambdas)
-        range = None
-        print("range")
-        print(range)
-        
-        corner_kwargs = copy.deepcopy(default_corner_kwargs)
-        corner_kwargs["range"] = range
-        
-        kwargs = {"first_color": my_colors["jim_no_taper"],
-                  "second_color": my_colors["jim"],
-                  "first_label": r"\textsc{Jim} (w/o taper)",
-                  "second_label": r"\textsc{Jim} (w/ taper)",
-                  "histogram_fill_color": "#b7d8e9"
-        }
-        
-        save_name = f"../figures/taper_comparison_{run_name}"
-        
-        js_div = compute_js_divergences(taper_samples, no_taper_samples, plot_name = "")
-        
-        print(js_div)
-        
-        plot_comparison(taper_samples, 
-                        no_taper_samples,
-                        idx_list = idx_list,
-                        use_weights = False,
-                        save_name = save_name,
-                        which_waveform = "NRTidalv2",
-                        convert_chi=convert_chi,
-                        convert_lambdas=convert_lambdas,
-                        corner_kwargs = corner_kwargs,
-                        **kwargs
-                        )
-        
-        print("DONE")
+                taper_samples = utils_compare_runs.get_chains_jim(taper_filename)
+                no_taper_samples = utils_compare_runs.get_chains_jim(no_taper_filename)
+                
+                convert_chi = True
+                convert_lambdas = True
+                
+                # TODO: typo here? Breaks the code
+                # n_dim = 13
+                # if convert_chi:
+                #     n_dim -= 1
+                # if convert_lambdas:
+                #     n_dim -= 1
+                
+                idx_list = [0] * 11
+                
+                # range = utils_compare_runs.get_ranges(run_name, convert_chi=convert_chi, convert_lambdas=convert_lambdas)
+                range = None
+                print("range")
+                print(range)
+                
+                corner_kwargs = copy.deepcopy(default_corner_kwargs)
+                corner_kwargs["range"] = range
+                
+                kwargs = {"first_color": my_colors["jim_no_taper"],
+                        "second_color": my_colors["jim"],
+                        "first_label": r"\textsc{Jim} (w/o taper)",
+                        "second_label": r"\textsc{Jim} (w/ taper)",
+                        "histogram_fill_color": "#b7d8e9"
+                }
+                
+                save_name = f"../figures/taper_comparison_{run_name}{suffix}"
+                
+                js_div = compute_js_divergences(taper_samples, no_taper_samples, plot_name = "")
+                
+                print(js_div)
+                
+                plot_comparison(taper_samples, 
+                                no_taper_samples,
+                                idx_list = idx_list,
+                                use_weights = False,
+                                save_name = save_name,
+                                which_waveform = "NRTidalv2",
+                                convert_chi=convert_chi,
+                                convert_lambdas=convert_lambdas,
+                                corner_kwargs = corner_kwargs,
+                                **kwargs
+                                )
+                
+                print("DONE")
     
 def main():
-    compare_jim_pbilby()
-    # compare_taper_runs()
+    # compare_jim_pbilby()
+    compare_taper_runs()
     
     # compute_js_divergences() # TODO: remove?
         

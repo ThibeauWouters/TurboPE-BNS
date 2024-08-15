@@ -61,20 +61,21 @@ def get_ranges_GW170817_TaylorF2(convert_chi, convert_lambdas):
 def get_ranges_GW170817_NRTidalv2(convert_chi, 
                                   convert_lambdas):
     
-    if convert_chi and convert_lambdas:
-        return [(1.197275, 1.19779),
-                (0.55, 1.0),
-                (-0.015, 0.049),
-                (0.0, 1250.0),
-                (-499.0, 499.0),
-                (10.0, 50.0),
-                (0.0, 2 * np.pi),
-                (1.75, np.pi),
-                (0.0, np.pi),
-                (3.35, 3.49),
-                (-0.5, -0.2)]
-    else:
-        return None
+    # if convert_chi and convert_lambdas:
+    #     return [(1.197275, 1.19779),
+    #             (0.55, 1.0),
+    #             (-0.015, 0.049),
+    #             (0.0, 1250.0),
+    #             (-499.0, 499.0),
+    #             (10.0, 50.0),
+    #             (0.0, 2 * np.pi),
+    #             (1.75, np.pi),
+    #             (0.0, np.pi),
+    #             (3.35, 3.49),
+    #             (-0.5, -0.2)]
+    # else:
+    #     return None
+    return None
         
       
 def get_ranges_GW190425_TaylorF2(convert_chi, convert_lambdas):
