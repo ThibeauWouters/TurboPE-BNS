@@ -7,7 +7,7 @@ os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.15"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
 from jimgw.single_event.likelihood import HeterodynedTransientLikelihoodFD
-from jimgw.single_event.waveform import RippleIMRPhenomD_NRTidalv2
+from jimgw.single_event.waveform import RippleIMRPhenomD_NRTidalv2, RippleIMRPhenomD_NRTidalv2_no_taper
 from jimgw.prior import Uniform, PowerLaw, Composite 
 import jax.numpy as jnp
 import jax
@@ -168,6 +168,7 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
 
+# to improve reproducibility, override the reference params after evosax has been run
 ref_params = {
     'M_c': 1.1975896,
     'eta': 0.2461001,
@@ -175,7 +176,7 @@ ref_params = {
     's2_z': 0.04888488,
     'lambda_1': 791.04366468,
     'lambda_2': 891.04366468,
-    'd_L': 16.06331818,
+    'd_L': 40.06331818,
     't_c': 0.00193536,
     'phase_c': 5.88649652,
     'iota': 1.93095421,
@@ -184,8 +185,20 @@ ref_params = {
     'dec': -0.34000186
 }
 
-n_bins = 1000
-likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
+n_bins = 1000 # NOTE 1000 gives good results, not sure about this
+
+outdir_name = "./outdir/"
+
+likelihood = HeterodynedTransientLikelihoodFD([H1, L1, V1], 
+                                              prior=prior, 
+                                              bounds=bounds, 
+                                              waveform=RippleIMRPhenomD_NRTidalv2(f_ref=f_ref), 
+                                              trigger_time=gps, 
+                                              duration=T, 
+                                              n_bins=n_bins, 
+                                              ref_params=ref_params, 
+                                              outdir_name=outdir_name,
+                                              )
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args
@@ -223,8 +236,6 @@ learning_rate = schedule_fn
 
 # Create jim object
 
-outdir_name = "./outdir/"
-
 jim = Jim(
     likelihood,
     prior,
@@ -245,7 +256,7 @@ jim = Jim(
     local_sampler_arg=local_sampler_arg,
     stopping_criterion_global_acc = 0.10,
     outdir_name=outdir_name
-) # n_loops_maximize_likelihood = 2000, ## unused
+)
 
 ### Heavy computation begins
 jim.sample(jax.random.PRNGKey(41))

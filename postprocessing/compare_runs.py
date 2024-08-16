@@ -11,6 +11,7 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 
+import os
 import time
 import numpy as np
 import matplotlib.pyplot as plt 
@@ -19,6 +20,7 @@ import corner
 import h5py
 import jax.numpy as jnp
 import jax
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 jax.config.update("jax_disable_jit", True)
 import json
 import copy
@@ -68,7 +70,8 @@ default_corner_kwargs = dict(bins=40,
 my_gray = "#ababab"
 my_blue = "#0f7db5"
 my_colors = {"jim": my_blue, 
-             "bilby": my_gray}
+             "bilby": my_gray,
+             "jim_no_taper": "#9b3460",} # "#dd4a89"
 histogram_fill_color = "#d6d6d6"
 
 labels_chi_eff = [r'$\mathcal{M}/M_\odot$', r'$q$', r'$\chi_{\rm eff}$', r'$\tilde{\Lambda}$', r'$\delta\tilde{\Lambda}$' ,r'$d_{\rm{L}}/{\rm Mpc}$',r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
@@ -131,28 +134,20 @@ def get_plot_samples(posterior_list: list[np.array],
     return plotsamples_list, plotsamples_dummy
 
 
-def plot_comparison(jim_path: str, 
-                    bilby_path: str, 
+
+def plot_comparison(jim_samples: np.array, 
+                    bilby_samples: np.array, 
                     idx_list: list,
                     use_weights = False,
+                    save: bool = True,
                     save_name = "corner_comparison",
                     which_waveform: str = "TaylorF2",
                     remove_tc: bool = True,
                     convert_chi: bool = True,
                     convert_lambdas: bool = False,
-                    **corner_kwargs):
+                    corner_kwargs: dict = {},
+                    **kwargs):
     
-    print("Reading bilby data")
-    if ".h5" in bilby_path:
-        bilby_samples = utils_compare_runs.get_chains_GWOSC(bilby_path, which_waveform=which_waveform)
-    else:
-        bilby_samples = utils_compare_runs.get_chains_bilby(bilby_path)
-
-    print("Reading jim data")
-    jim_samples = utils_compare_runs.get_chains_jim(jim_path, remove_tc = remove_tc)
-
-    print("Loading data complete")
-
     # If wanted, reweigh uniform samples to powerlaw samples
     if use_weights:
         weights = reweigh_distance(jim_samples)
@@ -228,10 +223,18 @@ def plot_comparison(jim_path: str,
     print(f"Saving plot of chains to {save_name}")
     plotsamples_list, dummy_values = get_plot_samples([jim_samples, bilby_samples], idx_list)
     
+    # Go over to selecting kwargs:
+    first_color = kwargs["first_color"] if "first_color" in kwargs else my_colors["jim"]
+    second_color = kwargs["second_color"] if "second_color" in kwargs else my_colors["bilby"]
+    
+    first_label = kwargs["first_label"] if "first_label" in kwargs else r'\textsc{Jim}'
+    second_label = kwargs["second_label"] if "second_label" in kwargs else r'\textsc{pBilby}'
+    histogram_fill_color = kwargs["histogram_fill_color"] if "histogram_fill_color" in kwargs else "#d6d6d6"
+    
     # Actual plotting
     hist_kwargs={'density': True, 'linewidth': 1.5}
     contour_lw = 2
-    for i, (samples, color) in enumerate(zip(plotsamples_list, [my_colors["jim"], my_colors["bilby"]])):
+    for i, (samples, color) in enumerate(zip(plotsamples_list, [first_color, second_color])):
         corner_kwargs["color"] = color
         if i == 1:
             # bilby kwargs
@@ -283,15 +286,17 @@ def plot_comparison(jim_path: str,
     # Add a custom legend
     legend_lw = 2
     legend_elements = [
-        mlines.Line2D([], [], color=my_colors["jim"], linewidth = legend_lw, label=r'\textsc{Jim}'),
-        mlines.Line2D([], [], color=my_colors["bilby"], linewidth = legend_lw, label=r'\textsc{pBilby}')
+        mlines.Line2D([], [], color=first_color, linewidth = legend_lw, label=first_label),
+        mlines.Line2D([], [], color=second_color, linewidth = legend_lw, label=second_label)
     ]
 
     # Create the legend
     fig.legend(handles=legend_elements, bbox_to_anchor=(0.925, 0.925), fontsize=40, frameon = False) 
     
-    for ext in ["png", "pdf"]:
-        plt.savefig(f"{save_name}.{ext}", bbox_inches='tight')
+    if save:
+        for ext in ["png", "pdf"]:
+            plt.savefig(f"{save_name}.{ext}", bbox_inches='tight')
+    plt.show()
     plt.close()
     
 
@@ -376,7 +381,7 @@ def compute_js_divergences(jim_chains: jnp.array,
 ### MAIN ###
 ############
 
-def main():
+def compare_jim_pbilby():
     
     start_time = time.time()
     save_path = "../figures/"
@@ -419,16 +424,33 @@ def main():
         corner_kwargs["range"] = range
         idx_list = utils_compare_runs.get_idx_list(event, convert_chi = convert_chi, convert_lambdas = convert_chi)
         
-        plot_comparison(jim_path, 
-                        bilby_path, 
+        print("Reading bilby data")
+        if ".h5" in bilby_path:
+            bilby_samples = utils_compare_runs.get_chains_GWOSC(bilby_path, which_waveform=which_waveform)
+        else:
+            print(f"bilby_path: {bilby_path}")
+            bilby_samples = utils_compare_runs.get_chains_bilby(bilby_path)
+
+        print("Reading jim data")
+        print(f"jim_path: {jim_path}")
+        jim_samples = utils_compare_runs.get_chains_jim(jim_path, remove_tc = True)
+        print("Loading data complete")
+        
+        save_name = save_path + event
+        if "no_taper" in jim_path:
+            save_name += "_no_taper"
+        
+        print("Starting plotting...")
+        plot_comparison(jim_samples, 
+                        bilby_samples, 
                         idx_list,
                         use_weights = False,
-                        save_name = save_path + event,
+                        save_name = save_name,
                         which_waveform = which_waveform,
                         remove_tc = True,
                         convert_chi = convert_chi,
                         convert_lambdas = convert_lambdas,
-                        **corner_kwargs)
+                        corner_kwargs=corner_kwargs)
         
         # ====== Computing the JS divergences ======
         
@@ -442,40 +464,78 @@ def main():
         print(js_dict)
         
         
-    # ====== Compare the bilby runs ======
-        
-    # paths_dict_bilby_comparison = {"GW190425_TaylorF2": {"peter": "/home/thibeau.wouters/jim_pbilby_samples/GW190425/GW190425-TF2_result.json",
-    #                                                      "gwosc": gwosc_path},
-                                   
-    #                                "GW190425_NRTidalv2": {"peter": "/home/thibeau.wouters/jim_pbilby_samples/GW190425/GW190425-IMRDNRTv2_result.json",
-    #                                                      "gwosc": gwosc_path}
-                  
-    #               }
-    
-    # print("Comparing the bilby runs")
-    # for event in paths_dict_bilby_comparison:
-    #     print("==============================================")
-    #     print(f"Comparing runs for: {event}")
-    #     print("==============================================")
-    #     peter_path = paths_dict_bilby_comparison[event]["peter"]
-    #     gwosc_path = paths_dict_bilby_comparison[event]["gwosc"]
-        
-    #     if "TaylorF2" in peter_path:
-    #         which_waveform = "TaylorF2"
-    #     else:
-    #         which_waveform = "PhenomDNRT"
-        
-    #     print(f"which waveform is set to {which_waveform}")
-        
-    #     compare_bilby_runs(peter_path, 
-    #                        gwosc_path, 
-    #                        save_name = save_path + event,
-    #                        which_waveform = which_waveform,
-    #                        remove_tc = True)
-    
     print("DONE")
     end_time = time.time()
     print(f"Time elapsed: {end_time - start_time} seconds")
+        
+
+def compare_taper_runs():
+    taper_path = "/home/thibeau.wouters/TurboPE-BNS/real_events/"
+    no_taper_path = "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/"
+    
+    for run_name in ["GW170817_NRTidalv2", "GW190425_NRTidalv2"]:
+    
+        taper_filename = os.path.join(taper_path, f"{run_name}/outdir/results_production.npz")
+        # For GW170817: load from the different, new runs
+        no_taper_filename = os.path.join(no_taper_path, f"{run_name}/outdir/results_production.npz")
+        
+        print(f"Making plots for no_taper_filename: {no_taper_filename}")
+
+        taper_samples = utils_compare_runs.get_chains_jim(taper_filename)
+        no_taper_samples = utils_compare_runs.get_chains_jim(no_taper_filename)
+        
+        convert_chi = True
+        convert_lambdas = True
+        
+        # TODO: typo here? Breaks the code
+        # n_dim = 13
+        # if convert_chi:
+        #     n_dim -= 1
+        # if convert_lambdas:
+        #     n_dim -= 1
+        
+        idx_list = [0] * 11
+        
+        # range = utils_compare_runs.get_ranges(run_name, convert_chi=convert_chi, convert_lambdas=convert_lambdas)
+        range = None
+        print("range")
+        print(range)
+        
+        corner_kwargs = copy.deepcopy(default_corner_kwargs)
+        corner_kwargs["range"] = range
+        
+        kwargs = {"first_color": my_colors["jim_no_taper"],
+                "second_color": my_colors["jim"],
+                "first_label": r"\textsc{Jim} (w/o taper)",
+                "second_label": r"\textsc{Jim} (w/ taper)",
+                "histogram_fill_color": "#b7d8e9"
+        }
+        
+        save_name = f"../figures/taper_comparison_{run_name}"
+        
+        js_div = compute_js_divergences(taper_samples, no_taper_samples, plot_name = "")
+        
+        print(js_div)
+        
+        plot_comparison(taper_samples, 
+                        no_taper_samples,
+                        idx_list = idx_list,
+                        use_weights = False,
+                        save_name = save_name,
+                        which_waveform = "NRTidalv2",
+                        convert_chi=convert_chi,
+                        convert_lambdas=convert_lambdas,
+                        corner_kwargs = corner_kwargs,
+                        **kwargs
+                        )
+        
+        print("DONE")
+    
+def main():
+    compare_jim_pbilby()
+    compare_taper_runs()
+    
+    # compute_js_divergences() # TODO: remove?
         
 if __name__ == "__main__":
     main()

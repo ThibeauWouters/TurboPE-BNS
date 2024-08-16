@@ -1,0 +1,1 @@
+Doing a few runs with varying seed to see how much we expect the JS divergence to be for a more realistic GW scenario rather than the Gaussian sampling thing reported by Romero-Shaw et al as in our first draft.

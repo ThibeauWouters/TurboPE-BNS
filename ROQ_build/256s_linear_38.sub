@@ -1,0 +1,13 @@
+universe = vanilla
+executable = /home/soichiro.morisaki/mambaforge/envs/tf2_bases/bin/python
+arguments = " create_basis.py --amplitude-max 0.2 --phase-max 0.2617993877991494 --mcmin 1.168798661959283 --mcmax 1.1779401337143756 --reference-chirp-mass 0.874 --duration 256 --fhigh 1024 --out out --extrapolate"
+getenv = True
+accounting_group = ligo.dev.o4.cbc.pe.lalinferenceonline
+accounting_group_user = thibeau.wouters
+request_memory = 15000M
+request_disk = 1000M
+notification = never
+log = log/256s_linear_38.log
+error = log/256s_linear_38.err
+output = log/256s_linear_38.out
+queue 1

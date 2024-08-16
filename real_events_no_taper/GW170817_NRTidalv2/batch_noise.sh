@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Loop 5 times
+for i in {1..5}
+do
+   echo " === Executing iteration $i ==="
+   python GW170817_noise.py
+done
+
+echo "All iterations completed!"

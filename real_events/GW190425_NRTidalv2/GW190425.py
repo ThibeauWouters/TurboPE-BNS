@@ -2,12 +2,12 @@ import psutil
 p = psutil.Process()
 p.cpu_affinity([0])
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.10"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.15"
 from jimgw.jim import Jim
 from jimgw.single_event.detector import H1, L1, V1
 from jimgw.single_event.likelihood import HeterodynedTransientLikelihoodFD
-from jimgw.single_event.waveform import RippleIMRPhenomD_NRTidalv2
+from jimgw.single_event.waveform import RippleIMRPhenomD_NRTidalv2, RippleIMRPhenomD_NRTidalv2_no_taper
 from jimgw.prior import Uniform, PowerLaw, Composite 
 import jax.numpy as jnp
 import jax
@@ -81,53 +81,14 @@ print(tukey_alpha)
 
 ### Getting detector data
 
-# Load the data
-L1.load_data(trigger_time=trigger_time,
-             gps_start_pad=duration-2,
-             gps_end_pad=2,
-             f_min=fmin,
-             f_max=fmax,
-             tukey_alpha = tukey_alpha,
-             load_psd = False)
+### This is our preprocessed data obtained from the TXT files at the GWOSC website (the GWF gave me NaNs?)
+L1.frequencies = np.genfromtxt(f'{data_path}L1_freq.txt')
+L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}L1_data_re.txt'), np.genfromtxt(f'{data_path}L1_data_im.txt')
+L1.data = L1_data_re + 1j * L1_data_im
 
-V1.load_data(trigger_time=trigger_time,
-             gps_start_pad=duration-2,
-             gps_end_pad=2,
-             f_min=fmin,
-             f_max=fmax,
-             tukey_alpha = tukey_alpha,
-             load_psd = False)
-
-# # Load the PSDs from given files
-# data_location = "/home/thibeau.wouters/gw-datasets/GW190425/"
-# L1.load_psd(L1.frequencies, data_location + "glitch_median_PSD_forLI_L1_srate8192.txt")
-# V1.load_psd(V1.frequencies, data_location + "glitch_median_PSD_forLI_V1_srate8192.txt")
-
-# data_location = "./data/"
-
-# data_dict = {"L1":{"data": data_path + "L-L1_HOFT_C01_T1700406_v3-1240211456-4096.gwf",
-#                    "psd": data_path + "glitch_median_PSD_forLI_L1_srate8192.txt",
-#                    "channel": "DCS-CALIB_STRAIN_CLEAN_C01_T1700406_v3"},
-#             "V1":{"data": data_path + "V-V1Online_T1700406_v3-1240214000-2000.gwf",
-#                     "psd": data_path + "glitch_median_PSD_forLI_V1_srate8192.txt",
-#                     "channel": "Hrec_hoft_16384Hz_T1700406_v3"}
-# }
-
-# L1.load_data_from_frame(trigger_time=trigger_time,
-#                         gps_start_pad=duration-2,
-#                         gps_end_pad=2,
-#                         frame_file_path=data_dict["L1"]["data"],
-#                         channel_name=data_dict["L1"]["channel"],
-#                         f_min=fmin,
-#                         f_max=fmax)
-
-# V1.load_data_from_frame(trigger_time=trigger_time,
-#                         gps_start_pad=duration-2,
-#                         gps_end_pad=2,
-#                         frame_file_path=data_dict["V1"]["data"],
-#                         channel_name=data_dict["V1"]["channel"],
-#                         f_min=fmin,
-#                         f_max=fmax)
+V1.frequencies = np.genfromtxt(f'{data_path}V1_freq.txt')
+V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}V1_data_re.txt'), np.genfromtxt(f'{data_path}V1_data_im.txt')
+V1.data = V1_data_re + 1j * V1_data_im
 
 L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
 V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
@@ -200,26 +161,35 @@ prior = Composite(prior_list)
 bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
-
 n_bins = 200
 
+# for reproducibility, fix the reference parameters
 ref_params = {
-    'M_c': 1.48673471,
-    'eta': 0.24964816,
-    's1_z': -0.03212059,
-    's2_z': 0.04940074,
-    'lambda_1': 170.66131572,
-    'lambda_2': 392.72069516,
-    'd_L': 90.496605,
-    't_c': 0.02454119,
-    'phase_c': 6.27789316,
-    'iota': 1.15036904,
-    'psi': 1.9846727,
-    'ra': 4.08402371,
-    'dec': 0.51115334
+    'M_c': 1.48691818,
+    'eta': 0.241871,
+    's1_z': 0.04999867,
+    's2_z': 0.00045155,
+    'lambda_1': 124.89143138,
+    'lambda_2': 505.92929128,
+    'd_L': 62.20843724,
+    't_c': 0.04139502,
+    'phase_c': 5.10878036,
+    'iota': 1.2916141,
+    'psi': 0.24112725,
+    'ra': 4.03454026,
+    'dec': 0.52655272
 }
 
-likelihood = HeterodynedTransientLikelihoodFD([L1, V1], prior=prior, bounds=bounds, waveform=RippleIMRPhenomD_NRTidalv2(), trigger_time=gps, duration=T, n_bins=n_bins, ref_params=ref_params)
+
+likelihood = HeterodynedTransientLikelihoodFD([L1, V1], 
+                                              prior=prior, 
+                                              bounds=bounds, 
+                                              waveform=RippleIMRPhenomD_NRTidalv2(), 
+                                              trigger_time=gps, 
+                                              duration=T, 
+                                              n_bins=n_bins, 
+                                              ref_params=ref_params, 
+                                              reference_waveform = RippleIMRPhenomD_NRTidalv2_no_taper(f_ref=f_ref))
 print("Running with n_bins  = ", n_bins)
 
 # Local sampler args

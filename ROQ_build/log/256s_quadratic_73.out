@@ -1,0 +1,125 @@
+Starting create basis now!
+Constructing training set with the size of 1875 ...
+This is the 1-th iteration. sigma is 2.116051092095811e-05.
+This is the 2-th iteration. sigma is 1.0578356684200926e-05.
+This is the 3-th iteration. sigma is 2.0351121245163154e-06.
+This is the 4-th iteration. sigma is 3.522815414800389e-07.
+This is the 5-th iteration. sigma is 9.237640649222629e-08.
+This is the 6-th iteration. sigma is 7.031478905860505e-08.
+This is the 7-th iteration. sigma is 4.3172748721619943e-08.
+This is the 8-th iteration. sigma is 1.2200090720978635e-08.
+This is the 9-th iteration. sigma is 6.978124018067152e-09.
+This is the 10-th iteration. sigma is 2.0491877696487752e-09.
+This is the 11-th iteration. sigma is 7.151127217257725e-10.
+This is the 12-th iteration. sigma is 4.4851699828641336e-10.
+This is the 13-th iteration. sigma is 3.0591034612508166e-10.
+This is the 14-th iteration. sigma is 8.623014648651104e-11.
+This is the 15-th iteration. sigma is 2.8759629071024414e-11.
+This is the 16-th iteration. sigma is 1.770337370825563e-11.
+This is the 17-th iteration. sigma is 6.123084776900605e-12.
+This is the 18-th iteration. sigma is 3.844026983140753e-12.
+This is the 19-th iteration. sigma is 3.2123520880669807e-12.
+This is the 20-th iteration. sigma is 6.544217472414118e-13.
+This is the 21-th iteration. sigma is 5.860928328864132e-13.
+This is the 22-th iteration. sigma is 3.899499959930355e-13.
+This is the 23-th iteration. sigma is 2.4349533632136265e-13.
+This is the 24-th iteration. sigma is 9.553897016179741e-14.
+This is the 25-th iteration. sigma is 4.138163880772537e-14.
+This is the 26-th iteration. sigma is 3.469309204535613e-14.
+This is the 27-th iteration. sigma is 1.8267328616310446e-14.
+This is the 28-th iteration. sigma is 1.0155280511567345e-14.
+This is the 29-th iteration. sigma is 5.847213754421039e-15.
+This is the 30-th iteration. sigma is 5.7143228509450976e-15.
+Validating the basis ...
+The maximum error is 1.3816117846142395e-12.
+The training set is not large enough. Repeat the basis construction with additional 1918 vectors.
+Constructing training set with the size of 3793 ...
+This is the 1-th iteration. sigma is 2.0933520037013883e-05.
+This is the 2-th iteration. sigma is 1.1614132573052987e-05.
+This is the 3-th iteration. sigma is 2.4513746366267483e-06.
+This is the 4-th iteration. sigma is 3.8265561904357397e-07.
+This is the 5-th iteration. sigma is 9.473210104570029e-08.
+This is the 6-th iteration. sigma is 9.143279935572888e-08.
+This is the 7-th iteration. sigma is 7.325357528982365e-08.
+This is the 8-th iteration. sigma is 1.2508030760365381e-08.
+This is the 9-th iteration. sigma is 7.77926666029388e-09.
+This is the 10-th iteration. sigma is 2.0964404325234413e-09.
+This is the 11-th iteration. sigma is 1.605843441087835e-09.
+This is the 12-th iteration. sigma is 4.356780663475773e-10.
+This is the 13-th iteration. sigma is 3.011709528875958e-10.
+This is the 14-th iteration. sigma is 1.0691998585724477e-10.
+This is the 15-th iteration. sigma is 2.971393830249796e-11.
+This is the 16-th iteration. sigma is 1.938547997513588e-11.
+This is the 17-th iteration. sigma is 1.3639481659991084e-11.
+This is the 18-th iteration. sigma is 6.8531839919858335e-12.
+This is the 19-th iteration. sigma is 6.211821846117855e-12.
+This is the 20-th iteration. sigma is 5.169730966818055e-12.
+This is the 21-th iteration. sigma is 3.4495142397617803e-12.
+This is the 22-th iteration. sigma is 3.133215290137611e-12.
+This is the 23-th iteration. sigma is 9.415333170826454e-13.
+This is the 24-th iteration. sigma is 6.673734790059904e-13.
+This is the 25-th iteration. sigma is 4.835308154691061e-13.
+This is the 26-th iteration. sigma is 3.7641556900362334e-13.
+This is the 27-th iteration. sigma is 2.4087294196989934e-13.
+This is the 28-th iteration. sigma is 1.9198806495521162e-13.
+This is the 29-th iteration. sigma is 1.5865984715468725e-13.
+This is the 30-th iteration. sigma is 7.922117808255426e-14.
+This is the 31-th iteration. sigma is 5.0414528582209825e-14.
+This is the 32-th iteration. sigma is 4.493018879689852e-14.
+This is the 33-th iteration. sigma is 2.903906264625569e-14.
+This is the 34-th iteration. sigma is 2.5024630775965014e-14.
+This is the 35-th iteration. sigma is 2.05229938432492e-14.
+This is the 36-th iteration. sigma is 1.1955256316551778e-14.
+This is the 37-th iteration. sigma is 9.83641507525418e-15.
+This is the 38-th iteration. sigma is 7.464674264515519e-15.
+This is the 39-th iteration. sigma is 5.7170653627410294e-15.
+Validating the basis ...
+The maximum error is 7.907967358201928e-15.
+The training set is not large enough. Repeat the basis construction with additional 17 vectors.
+Constructing training set with the size of 3810 ...
+This is the 1-th iteration. sigma is 2.0933520037013883e-05.
+This is the 2-th iteration. sigma is 1.1614132573052987e-05.
+This is the 3-th iteration. sigma is 2.4513746366267483e-06.
+This is the 4-th iteration. sigma is 3.8265561904357397e-07.
+This is the 5-th iteration. sigma is 9.473210104570029e-08.
+This is the 6-th iteration. sigma is 9.143279935572888e-08.
+This is the 7-th iteration. sigma is 7.325357528982365e-08.
+This is the 8-th iteration. sigma is 1.2508030760365381e-08.
+This is the 9-th iteration. sigma is 7.77926666029388e-09.
+This is the 10-th iteration. sigma is 2.191700173398597e-09.
+This is the 11-th iteration. sigma is 1.9345099582599962e-09.
+This is the 12-th iteration. sigma is 5.002377379175369e-10.
+This is the 13-th iteration. sigma is 3.2597845949173795e-10.
+This is the 14-th iteration. sigma is 1.836765081476972e-10.
+This is the 15-th iteration. sigma is 3.564407368111253e-11.
+This is the 16-th iteration. sigma is 1.6806808547042593e-11.
+This is the 17-th iteration. sigma is 1.6107587084710778e-11.
+This is the 18-th iteration. sigma is 6.829618150845756e-12.
+This is the 19-th iteration. sigma is 6.367627235602253e-12.
+This is the 20-th iteration. sigma is 5.26311955777547e-12.
+This is the 21-th iteration. sigma is 3.6860220430413084e-12.
+This is the 22-th iteration. sigma is 1.771053058503257e-12.
+This is the 23-th iteration. sigma is 1.036268238548875e-12.
+This is the 24-th iteration. sigma is 9.001764199653037e-13.
+This is the 25-th iteration. sigma is 7.454032407548977e-13.
+This is the 26-th iteration. sigma is 4.0791359292324896e-13.
+This is the 27-th iteration. sigma is 2.5916816734917125e-13.
+This is the 28-th iteration. sigma is 2.2635220195279374e-13.
+This is the 29-th iteration. sigma is 1.6724280811817467e-13.
+This is the 30-th iteration. sigma is 8.396606041017341e-14.
+This is the 31-th iteration. sigma is 3.553357644982238e-14.
+This is the 32-th iteration. sigma is 3.321393642863159e-14.
+This is the 33-th iteration. sigma is 2.936594447278126e-14.
+This is the 34-th iteration. sigma is 2.4344382263813183e-14.
+This is the 35-th iteration. sigma is 1.825988780698928e-14.
+This is the 36-th iteration. sigma is 1.69706098753407e-14.
+This is the 37-th iteration. sigma is 8.782449775338379e-15.
+This is the 38-th iteration. sigma is 7.910464584995578e-15.
+This is the 39-th iteration. sigma is 7.365375183775588e-15.
+This is the 40-th iteration. sigma is 5.853408298895765e-15.
+This is the 41-th iteration. sigma is 5.717046786956557e-15.
+Validating the basis ...
+The maximum error is 4.979523737791425e-15.
+Basis construction was done!
+HEY THERE, total time was:
+2699.2973988056183
