@@ -19,7 +19,7 @@ bilby_root_path = "/home/thibeau.wouters/jim_pbilby_samples/older_bilby_version/
 paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/outdir/results_production.npz",
                     "bilby": bilby_root_path + "GW170817_TF2_with_tukey_fix_result.json"},
               
-              "GW170817_NRTidalv2": {"jim": jim_root_path + "GW170817_NRTidalv2/outdir/results_production.npz",
+              "GW170817_NRTidalv2": {"jim": jim_root_path_no_taper + "GW170817_NRTidalv2/outdir/results_production.npz",
                                      "bilby": bilby_root_path + "GW170817_IMRPhenomD_NRTidalv2_result.json",
                     },
               
@@ -27,7 +27,7 @@ paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/ou
                                     "bilby": bilby_root_path + "GW190425_GWOSC_data_result.json",
                     },
               
-              "GW190425_NRTidalv2": {"jim": jim_root_path + "GW190425_NRTidalv2/outdir/results_production.npz",
+              "GW190425_NRTidalv2": {"jim": jim_root_path_no_taper + "GW190425_NRTidalv2/outdir/results_production.npz",
                                      "bilby": bilby_root_path + "GW190425_NRTv2_GWOSC_data_result.json",
                     },
 }
@@ -61,21 +61,20 @@ def get_ranges_GW170817_TaylorF2(convert_chi, convert_lambdas):
 def get_ranges_GW170817_NRTidalv2(convert_chi, 
                                   convert_lambdas):
     
-    # if convert_chi and convert_lambdas:
-    #     return [(1.197275, 1.19779),
-    #             (0.55, 1.0),
-    #             (-0.015, 0.049),
-    #             (0.0, 1250.0),
-    #             (-499.0, 499.0),
-    #             (10.0, 50.0),
-    #             (0.0, 2 * np.pi),
-    #             (1.75, np.pi),
-    #             (0.0, np.pi),
-    #             (3.35, 3.49),
-    #             (-0.5, -0.2)]
-    # else:
-    #     return None
-    return None
+    if convert_chi and convert_lambdas:
+        return [(1.197275, 1.19779),
+                (0.55, 1.0),
+                (-0.015, 0.049),
+                (0.0, 1250.0),
+                (-499.0, 499.0),
+                (10.0, 50.0),
+                (0.0, 2 * np.pi),
+                (1.75, np.pi),
+                (0.0, np.pi),
+                (3.35, 3.49),
+                (-0.5, -0.2)]
+    else:
+        return None
         
       
 def get_ranges_GW190425_TaylorF2(convert_chi, convert_lambdas):
