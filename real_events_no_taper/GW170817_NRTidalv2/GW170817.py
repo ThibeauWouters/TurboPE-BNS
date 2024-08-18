@@ -246,7 +246,7 @@ jim = Jim(
     n_local_steps=10,
     n_global_steps=300,
     n_chains=1000,
-    n_epochs=100,
+    n_epochs=50,
     learning_rate=schedule_fn,
     max_samples=50000,
     momentum=0.9,
@@ -261,7 +261,7 @@ jim = Jim(
 )
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(447462))
+jim.sample(jax.random.PRNGKey(965341))
 ### Heavy computation ends
 
 # === Show results, save output ===
