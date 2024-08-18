@@ -115,21 +115,12 @@ def get_plot_samples(posterior_list: list[np.array],
         sampled_posterior = posterior[sampled_idx]
         plotsamples_list.append(sampled_posterior)
         
-    # Create plotsamples dummy
-    print("np.shape(plotsamples_list)")
-    print(np.shape(plotsamples_list))
-    
     # plotsamples_dummy = np.vstack([plotsamples_list[idx_list[i]] for i in range(len(idx_list))])
     plotsamples_dummy = np.empty_like(plotsamples_list[0])
     print(np.shape(plotsamples_dummy))
     plotsamples_list = np.array(plotsamples_list)
     for i in range(len(idx_list)):
         plotsamples_dummy[:, i] = plotsamples_list[idx_list[i], :, i]
-    
-    print("np.shape(plotsamples_list)")
-    print(np.shape(plotsamples_list))
-    print("np.shape(plotsamples_dummy)")
-    print(np.shape(plotsamples_dummy))
     
     return plotsamples_list, plotsamples_dummy
 
@@ -159,34 +150,24 @@ def plot_comparison(jim_samples: np.array,
     jim_samples = utils_compare_runs.preprocess_samples(jim_samples, convert_chi = convert_chi, convert_lambdas = convert_lambdas)
     bilby_samples = utils_compare_runs.preprocess_samples(bilby_samples, convert_chi = convert_chi, convert_lambdas = convert_lambdas)
     
-    print("jim_samples")
-    print(jim_samples)
-    
-    print("bilby_samples")
-    print(bilby_samples)
-    
     # Drop NaNs:
     nan_idx_list = np.argwhere(np.isnan(bilby_samples))
     nan_idx_list = np.unique(nan_idx_list[:, 0])
-    print("Dropping NaNs: ", nan_idx_list)
     bilby_samples = np.delete(bilby_samples, nan_idx_list, axis=0)
     
     # Drop infs:
     inf_idx_list = np.argwhere(np.isinf(bilby_samples))
     inf_idx_list = np.unique(inf_idx_list[:, 0])
-    print("Dropping infs: ", inf_idx_list)
     bilby_samples = np.delete(bilby_samples, inf_idx_list, axis=0)
     
     # Same for jim samples:
     nan_idx_list = np.argwhere(np.isnan(jim_samples))
     nan_idx_list = np.unique(nan_idx_list[:, 0])
-    print("Dropping NaNs: ", nan_idx_list)
     jim_samples = np.delete(jim_samples, nan_idx_list, axis=0)
     
     # Drop infs:
     inf_idx_list = np.argwhere(np.isinf(jim_samples))
     inf_idx_list = np.unique(inf_idx_list[:, 0])
-    print("Dropping infs: ", inf_idx_list)
     jim_samples = np.delete(jim_samples, inf_idx_list, axis=0)
     
     # Remove the t_c label for comparison with bilby
@@ -209,11 +190,6 @@ def plot_comparison(jim_samples: np.array,
         labels.remove(r'$\chi_2$')
         labels.insert(2, r'$\chi_{\rm eff}$')
         
-    # print("Now giving to turboPE function:")
-    # lims = corner_kwargs["range"], TODO: change
-    # result = plot_comparison_turbope(jim_samples, bilby_samples, labels,  save_name = save_name)
-    
-    # return result
     if "170817" in save_name:
         labelpad = 0.25
     else:
@@ -267,10 +243,12 @@ def plot_comparison(jim_samples: np.array,
             hist_kwargs["zorder"] = zorder
             hist_kwargs["color"] = color
         
+        corner_kwargs["hist_kwargs"] = hist_kwargs
+        corner_kwargs["density"] = True
         if i == 0:
-            fig = corner.corner(samples, labels = labels, weights=weights, hist_kwargs=hist_kwargs, **corner_kwargs)
+            fig = corner.corner(samples, labels = labels, weights=weights, **corner_kwargs)
         else:
-            corner.corner(samples, labels = labels, fig=fig, weights=weights, hist_kwargs=hist_kwargs, **corner_kwargs)
+            corner.corner(samples, labels = labels, fig=fig, weights=weights, **corner_kwargs)
     
     # Dummy postprocessing
     corner_kwargs["color"] = "white"
@@ -281,7 +259,10 @@ def plot_comparison(jim_samples: np.array,
                                         "linewidths": 0.0,
                                         "alpha": 0.0}
     corner_kwargs["contourf_kwargs"] = {"zorder": 0.00001}
-    corner.corner(dummy_values, fig=fig, hist_kwargs={'density': True, 'alpha': 0}, **corner_kwargs)
+    
+    hist_kwargs={'density': True, 'alpha': 0}
+    corner_kwargs["hist_kwargs"] = hist_kwargs
+    corner.corner(dummy_values, fig=fig, **corner_kwargs)
     
     # Add a custom legend
     legend_lw = 2
@@ -419,8 +400,6 @@ def compare_jim_pbilby():
         
         # Fetch the desired kwargs from the specified dict
         range = utils_compare_runs.get_ranges(event, convert_chi, convert_lambdas)
-        print("range")
-        print(range)
         corner_kwargs["range"] = range
         idx_list = utils_compare_runs.get_idx_list(event, convert_chi = convert_chi, convert_lambdas = convert_chi)
         
@@ -452,6 +431,7 @@ def compare_jim_pbilby():
                         convert_lambdas = convert_lambdas,
                         corner_kwargs=corner_kwargs)
         
+        print("Starting plotting... done!")
         # ====== Computing the JS divergences ======
         
         jim_chains = utils_compare_runs.get_chains_jim(jim_path)
@@ -476,8 +456,10 @@ def compare_taper_runs():
     for run_name in ["GW170817_NRTidalv2", "GW190425_NRTidalv2"]:
     
         taper_filename = os.path.join(taper_path, f"{run_name}/outdir/results_production.npz")
-        # For GW170817: load from the different, new runs
-        no_taper_filename = os.path.join(no_taper_path, f"{run_name}/outdir/results_production.npz")
+        if run_name == "GW170817_NRTidalv2":
+            no_taper_filename = "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/outdir_965341/results_production.npz"
+        else:
+            no_taper_filename = os.path.join(no_taper_path, f"{run_name}/outdir/results_production.npz")
         
         print(f"Making plots for no_taper_filename: {no_taper_filename}")
 
@@ -498,8 +480,6 @@ def compare_taper_runs():
         
         # range = utils_compare_runs.get_ranges(run_name, convert_chi=convert_chi, convert_lambdas=convert_lambdas)
         range = None
-        print("range")
-        print(range)
         
         corner_kwargs = copy.deepcopy(default_corner_kwargs)
         corner_kwargs["range"] = range
@@ -514,8 +494,6 @@ def compare_taper_runs():
         save_name = f"../figures/taper_comparison_{run_name}"
         
         js_div = compute_js_divergences(taper_samples, no_taper_samples, plot_name = "")
-        
-        print(js_div)
         
         plot_comparison(taper_samples, 
                         no_taper_samples,
@@ -533,7 +511,7 @@ def compare_taper_runs():
     
 def main():
     compare_jim_pbilby()
-    compare_taper_runs()
+    # compare_taper_runs()
     
     # compute_js_divergences() # TODO: remove?
         
