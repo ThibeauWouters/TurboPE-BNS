@@ -19,7 +19,7 @@ bilby_root_path = "/home/thibeau.wouters/jim_pbilby_samples/older_bilby_version/
 paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/outdir/results_production.npz",
                     "bilby": bilby_root_path + "GW170817_TF2_with_tukey_fix_result.json"},
               
-              "GW170817_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/outdir_965341/results_production.npz", #jim_root_path_no_taper + "GW170817_NRTidalv2/outdir/results_production.npz",
+              "GW170817_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/backup/results_production.npz", #jim_root_path_no_taper + "GW170817_NRTidalv2/outdir/results_production.npz", # TODO: change to original location after rerun is finished
                                      "bilby": bilby_root_path + "GW170817_IMRPhenomD_NRTidalv2_result.json",
                     },
               
@@ -27,7 +27,7 @@ paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/ou
                                     "bilby": bilby_root_path + "GW190425_GWOSC_data_result.json",
                     },
               
-              "GW190425_NRTidalv2": {"jim": jim_root_path + "GW190425_NRTidalv2/outdir/results_production.npz", # this is with no taper already, see copy script there
+              "GW190425_NRTidalv2": {"jim": jim_root_path_no_taper + "GW190425_NRTidalv2/outdir/results_production.npz", # this is with no taper already, see copy script there
                                      "bilby": bilby_root_path + "GW190425_NRTv2_GWOSC_data_result.json",
                     },
 }

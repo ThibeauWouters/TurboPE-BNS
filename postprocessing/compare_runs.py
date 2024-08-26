@@ -71,7 +71,7 @@ my_gray = "#ababab"
 my_blue = "#0f7db5"
 my_colors = {"jim": my_blue, 
              "bilby": my_gray,
-             "jim_no_taper": "#9b3460",} # "#dd4a89"
+             "jim_with_taper": "#9b3460",} # "#dd4a89"
 histogram_fill_color = "#d6d6d6"
 
 labels_chi_eff = [r'$\mathcal{M}/M_\odot$', r'$q$', r'$\chi_{\rm eff}$', r'$\tilde{\Lambda}$', r'$\delta\tilde{\Lambda}$' ,r'$d_{\rm{L}}/{\rm Mpc}$',r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
@@ -455,13 +455,14 @@ def compare_taper_runs():
     
     for run_name in ["GW170817_NRTidalv2", "GW190425_NRTidalv2"]:
     
-        taper_filename = os.path.join(taper_path, f"{run_name}/outdir/results_production.npz")
         if run_name == "GW170817_NRTidalv2":
-            no_taper_filename = "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/outdir_965341/results_production.npz"
+            no_taper_filename = "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/backup/results_production.npz"
+            taper_filename = "/home/thibeau.wouters/TurboPE-BNS/real_events/GW170817_NRTidalv2/outdir_backup/results_production.npz"
         else:
-            no_taper_filename = os.path.join(no_taper_path, f"{run_name}/outdir/results_production.npz")
+            no_taper_filename = "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW190425_NRTidalv2/outdir/results_production.npz"
+            taper_filename = "/home/thibeau.wouters/TurboPE-BNS/real_events/GW190425_NRTidalv2/outdir_backup/results_production.npz"
         
-        print(f"Making plots for no_taper_filename: {no_taper_filename}")
+        print(f" === Making plots for no_taper_filename: {no_taper_filename} === ")
 
         taper_samples = utils_compare_runs.get_chains_jim(taper_filename)
         no_taper_samples = utils_compare_runs.get_chains_jim(no_taper_filename)
@@ -484,8 +485,8 @@ def compare_taper_runs():
         corner_kwargs = copy.deepcopy(default_corner_kwargs)
         corner_kwargs["range"] = range
         
-        kwargs = {"first_color": my_colors["jim_no_taper"],
-                "second_color": my_colors["jim"],
+        kwargs = {"first_color": my_colors["jim"],
+                "second_color": my_colors["jim_with_taper"],
                 "first_label": r"\textsc{Jim} (w/o taper)",
                 "second_label": r"\textsc{Jim} (w/ taper)",
                 "histogram_fill_color": "#b7d8e9"
@@ -510,8 +511,8 @@ def compare_taper_runs():
         print("DONE")
     
 def main():
-    compare_jim_pbilby()
-    # compare_taper_runs()
+    # compare_jim_pbilby()
+    compare_taper_runs()
     
     # compute_js_divergences() # TODO: remove?
         
