@@ -161,7 +161,7 @@ prior = Composite(prior_list)
 bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 
 ### Create likelihood object
-n_bins = 200
+n_bins = 1_000
 
 # for reproducibility, fix the reference parameters
 ref_params = {

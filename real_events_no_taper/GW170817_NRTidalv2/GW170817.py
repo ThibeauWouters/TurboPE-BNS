@@ -261,7 +261,7 @@ jim = Jim(
 )
 
 ### Heavy computation begins
-jim.sample(jax.random.PRNGKey(447462))
+jim.sample(jax.random.PRNGKey(965341))
 ### Heavy computation ends
 
 # === Show results, save output ===
