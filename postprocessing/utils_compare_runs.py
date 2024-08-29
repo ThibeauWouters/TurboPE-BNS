@@ -52,9 +52,9 @@ bilby_RB_paths_dict = {"GW170817_TaylorF2": bilby_root_path_RB + "GW170817_Taylo
                        "GW190425_NRTidalv2": bilby_root_path_RB + "GW190425_NRTidalv2_result.hdf5"}
 
 # ROQ:
-bilby_root_path_RB = "../ROQ/"
-bilby_RB_paths_dict = {"GW170817_NRTidalv2": bilby_root_path_RB + "gw170817_ROQ_result.hdf5",
-                       "GW190425_NRTidalv2": bilby_root_path_RB + "gw190425_ROQ_result.hdf5"}
+bilby_root_path_ROQ = "../ROQ/"
+bilby_ROQ_paths_dict = {"GW170817_NRTidalv2": bilby_root_path_ROQ + "gw170817_ROQ_result.hdf5",
+                        "GW190425_NRTidalv2": bilby_root_path_ROQ + "gw190425_ROQ_result.hdf5"}
 
 ### RANGES ###
 
@@ -300,7 +300,7 @@ def get_chains_hdf5(filename: str) -> np.ndarray:
     
     # Load the posterior samples from the HDF5 file
     with h5py.File(filename, 'r') as file:
-        posterior = file['posterior_samples']
+        posterior = file['posterior']
         posterior_samples = np.array([posterior[key][()] for key in bilby_names])
         posterior_samples = np.asarray(posterior_samples).T
         
