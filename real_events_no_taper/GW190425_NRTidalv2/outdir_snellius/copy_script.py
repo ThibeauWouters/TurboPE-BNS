@@ -181,7 +181,6 @@ ref_params = {
     'dec': 0.52655272
 }
 outdir_name = "./outdir/"
-n_loops = 2 # we skip the Evosax
 
 likelihood = HeterodynedTransientLikelihoodFD([L1, V1], 
                                               prior=prior, 
@@ -190,7 +189,6 @@ likelihood = HeterodynedTransientLikelihoodFD([L1, V1],
                                               trigger_time=gps, 
                                               duration=T, 
                                               n_bins=n_bins, 
-                                              n_loops = n_loops,
                                               outdir_name=outdir_name,
                                               ref_params=ref_params,
                                               reference_waveform = RippleIMRPhenomD_NRTidalv2_no_taper(f_ref=f_ref)) # NEW!!!
