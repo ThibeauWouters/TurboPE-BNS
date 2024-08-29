@@ -12,7 +12,7 @@ now=$(date)
 echo "$now"
 
 # Define dirs
-export events_dir=$HOME/TurboPE-BNS/real_events/
+export events_dir=$HOME/TurboPE-BNS/real_events_no_taper/
 export this_dir=$events_dir/GW170817_NRTidalv2
 
 # Loading modules
