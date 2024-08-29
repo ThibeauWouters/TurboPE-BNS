@@ -165,7 +165,7 @@ def get_idx_list_GW170817_TaylorF2(n_dim: int = 12):
 
 def get_idx_list_GW170817_NRTidalv2(n_dim: int = 12):
     if n_dim == 11:
-        idx_list = [1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0] # 1 is jim
+        idx_list = [1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0] # 1 is jim
         assert len(idx_list) == n_dim, "Length of idx_list does not match n_dim in get_idx_list!"
         
     return idx_list
