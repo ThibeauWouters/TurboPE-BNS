@@ -23,7 +23,7 @@ bilby_root_path = "/home/thibeau.wouters/jim_pbilby_samples/older_bilby_version/
 paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/outdir/results_production.npz",
                     "bilby": bilby_root_path + "GW170817_TF2_with_tukey_fix_result.json"},
               
-              "GW170817_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/outdir_965341/results_production.npz", #jim_root_path_no_taper + "GW170817_NRTidalv2/outdir/results_production.npz",
+              "GW170817_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/outdir/results_production.npz", #jim_root_path_no_taper + "GW170817_NRTidalv2/outdir/results_production.npz",
                                      "bilby": bilby_root_path + "GW170817_IMRPhenomD_NRTidalv2_result.json",
                     },
               
@@ -165,7 +165,7 @@ def get_idx_list_GW170817_TaylorF2(n_dim: int = 12):
 
 def get_idx_list_GW170817_NRTidalv2(n_dim: int = 12):
     if n_dim == 11:
-        idx_list = [1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0] # 1 is jim
+        idx_list = [1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0] # 1 is jim
         assert len(idx_list) == n_dim, "Length of idx_list does not match n_dim in get_idx_list!"
         
     return idx_list

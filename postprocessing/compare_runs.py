@@ -399,8 +399,7 @@ def compare_jim_pbilby():
         corner_kwargs = copy.deepcopy(default_corner_kwargs)
         
         # Fetch the desired kwargs from the specified dict
-        # range = utils_compare_runs.get_ranges(event, convert_chi, convert_lambdas)
-        range = None
+        range = utils_compare_runs.get_ranges(event, convert_chi, convert_lambdas)
         corner_kwargs["range"] = range
         idx_list = utils_compare_runs.get_idx_list(event, convert_chi = convert_chi, convert_lambdas = convert_chi)
         
