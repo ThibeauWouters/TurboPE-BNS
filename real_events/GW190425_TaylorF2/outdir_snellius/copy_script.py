@@ -49,38 +49,7 @@ labels = [r'$M_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lambda$', r'$\
                r'$t_c$', r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
 naming = ['M_c', 'q', 's1_z', 's2_z', 'lambda_1', 'lambda_2', 'd_L', 't_c', 'phase_c', 'cos_iota', 'psi', 'ra', 'sin_dec']
 
-data_path = "/home/twouters2/gw-datasets/GW190425/"
-
-################
-### PREAMBLE ###
-################
-
-default_corner_kwargs = dict(bins=40, 
-                        smooth=1., 
-                        show_titles=False,
-                        label_kwargs=dict(fontsize=16),
-                        title_kwargs=dict(fontsize=16), 
-                        color="blue",
-                        # quantiles=[],
-                        # levels=[0.9],
-                        plot_density=True, 
-                        plot_datapoints=False, 
-                        fill_contours=True,
-                        max_n_ticks=4, 
-                        min_n_ticks=3,
-                        save=False)
-
-params = {
-    "axes.labelsize": 30,
-    "axes.titlesize": 30,
-    "text.usetex": True,
-    "font.family": "serif",
-}
-plt.rcParams.update(params)
-
-labels = [r'$M_c/M_\odot$', r'$q$', r'$\chi_1$', r'$\chi_2$', r'$\Lambda$', r'$\delta\Lambda$', r'$d_{\rm{L}}/{\rm Mpc}$',
-               r'$t_c$', r'$\phi_c$', r'$\iota$', r'$\psi$', r'$\alpha$', r'$\delta$']
-naming = ['M_c', 'q', 's1_z', 's2_z', 'lambda_1', 'lambda_2', 'd_L', 't_c', 'phase_c', 'cos_iota', 'psi', 'ra', 'sin_dec']
+data_path = "/home/twouters2/gw-datasets/GW190425/" # on CIT
 
 start_runtime = time.time()
 
@@ -106,27 +75,40 @@ tukey_alpha = 2 / (T / 2)
 
 ### Getting detector data
 
-# Load the data
-L1.load_data(trigger_time=trigger_time,
-             gps_start_pad=duration-2,
-             gps_end_pad=2,
-             f_min=fmin,
-             f_max=fmax,
-             tukey_alpha = tukey_alpha,
-             load_psd = False)
+# # Load the data
+# L1.load_data(trigger_time=trigger_time,
+#              gps_start_pad=duration-2,
+#              gps_end_pad=2,
+#              f_min=fmin,
+#              f_max=fmax,
+#              tukey_alpha = tukey_alpha,
+#              load_psd = False)
 
-V1.load_data(trigger_time=trigger_time,
-             gps_start_pad=duration-2,
-             gps_end_pad=2,
-             f_min=fmin,
-             f_max=fmax,
-             tukey_alpha = tukey_alpha,
-             load_psd = False)
+# V1.load_data(trigger_time=trigger_time,
+#              gps_start_pad=duration-2,
+#              gps_end_pad=2,
+#              f_min=fmin,
+#              f_max=fmax,
+#              tukey_alpha = tukey_alpha,
+#              load_psd = False)
+
+# L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
+# V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
+
+### This is our preprocessed data obtained from the TXT files at the GWOSC website (the GWF gave me NaNs?)
+L1.frequencies = np.genfromtxt(f'{data_path}L1_freq.txt')
+L1_data_re, L1_data_im = np.genfromtxt(f'{data_path}L1_data_re.txt'), np.genfromtxt(f'{data_path}L1_data_im.txt')
+L1.data = L1_data_re + 1j * L1_data_im
+
+V1.frequencies = np.genfromtxt(f'{data_path}V1_freq.txt')
+V1_data_re, V1_data_im = np.genfromtxt(f'{data_path}V1_data_re.txt'), np.genfromtxt(f'{data_path}V1_data_im.txt')
+V1.data = V1_data_re + 1j * V1_data_im
+
+# Load the PSD
 
 L1.psd = L1.load_psd(L1.frequencies, data_path + "glitch_median_PSD_forLI_L1_srate8192.txt")
 V1.psd = V1.load_psd(V1.frequencies, data_path + "glitch_median_PSD_forLI_V1_srate8192.txt")
 
-### Define priors
 
 # Internal parameters
 Mc_prior = Uniform(1.485, 1.490, naming=["M_c"])
@@ -196,7 +178,7 @@ bounds = jnp.array([[p.xmin, p.xmax] for p in prior.priors])
 ### Create likelihood object
 
 n_bins = 200
-
+# for reproducibility, fix reference parameters
 ref_params = {
     'M_c': 1.486722,
     'eta': 0.18946014,
