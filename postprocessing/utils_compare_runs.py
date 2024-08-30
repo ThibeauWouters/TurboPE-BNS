@@ -23,7 +23,7 @@ bilby_root_path = "/home/thibeau.wouters/jim_pbilby_samples/older_bilby_version/
 paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/outdir/results_production.npz",
                     "bilby": bilby_root_path + "GW170817_TF2_with_tukey_fix_result.json"},
               
-              "GW170817_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/outdir/results_production.npz", #jim_root_path_no_taper + "GW170817_NRTidalv2/outdir/results_production.npz",
+              "GW170817_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/outdir/results_production.npz",
                                      "bilby": bilby_root_path + "GW170817_IMRPhenomD_NRTidalv2_result.json",
                     },
               
@@ -52,7 +52,7 @@ bilby_RB_paths_dict = {"GW170817_TaylorF2": bilby_root_path_RB + "GW170817_Taylo
                        "GW190425_NRTidalv2": bilby_root_path_RB + "GW190425_NRTidalv2_result.hdf5"}
 
 # ROQ:
-bilby_root_path_ROQ = "../ROQ/"
+bilby_root_path_ROQ = "../ROQ/Peter/"
 bilby_ROQ_paths_dict = {"GW170817_NRTidalv2": bilby_root_path_ROQ + "gw170817_ROQ_result.hdf5",
                         "GW190425_NRTidalv2": bilby_root_path_ROQ + "gw190425_ROQ_result.hdf5"}
 
