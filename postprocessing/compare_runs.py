@@ -370,10 +370,10 @@ def compare_jim_pbilby():
     convert_lambdas = True
     
     events_to_plot = [
+        # "GW170817_TaylorF2",
         "GW170817_NRTidalv2",
-        "GW170817_TaylorF2",
-        "GW190425_TaylorF2",
-        "GW190425_NRTidalv2",
+        # "GW190425_TaylorF2",
+        # "GW190425_NRTidalv2",
 ]
     
     for event in events_to_plot:

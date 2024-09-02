@@ -17,13 +17,14 @@ from ripple import get_chi_eff, Mc_eta_to_ms, lambda_tildes_to_lambdas, lambdas_
 
 gwosc_path = "/home/thibeau.wouters/gw-datasets/GW190425/posterior_samples.h5"
 jim_root_path = "/home/thibeau.wouters/TurboPE-BNS/real_events/"
+jim_root_path_from_bilby = "/home/thibeau.wouters/TurboPE-BNS/real_events_from_bilby/"
 jim_root_path_no_taper = "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/"
 bilby_root_path = "/home/thibeau.wouters/jim_pbilby_samples/older_bilby_version/"
 
 paths_dict = {"GW170817_TaylorF2": {"jim": jim_root_path + "GW170817_TaylorF2/outdir/results_production.npz",
                     "bilby": bilby_root_path + "GW170817_TF2_with_tukey_fix_result.json"},
               
-              "GW170817_NRTidalv2": {"jim": "/home/thibeau.wouters/TurboPE-BNS/real_events_no_taper/GW170817_NRTidalv2/outdir/results_production.npz",
+              "GW170817_NRTidalv2": {"jim": jim_root_path_from_bilby + "GW170817_NRTidalv2/outdir/results_production.npz",
                                      "bilby": bilby_root_path + "GW170817_IMRPhenomD_NRTidalv2_result.json",
                     },
               
